@@ -1,0 +1,15 @@
+{
+  "name": "userjs-tk-javascript",
+  "version": "1.0.0",
+  "description": "A library wrap userjs for easy to use.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/greasemonkey": "0.0.28"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cologler",
+  "license": "MIT"
+}
