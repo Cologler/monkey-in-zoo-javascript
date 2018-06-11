@@ -1,7 +1,7 @@
 {
-  "name": "userjs-tk-javascript",
+  "name": "monkey-in-zoo-javascript",
   "version": "1.0.0",
-  "description": "A library wrap userjs for easy to use.",
+  "description": "monkey-in-zoo is a library wrap greasemonkey api for easy to use.",
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {

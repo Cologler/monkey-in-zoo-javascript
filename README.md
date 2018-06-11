@@ -1,5 +1,5 @@
-# userjs toolkit
+# monkey-in-zoo
 
-A library wrap userjs for easy to use.
+**monkey-in-zoo** is a library wrap greasemonkey api for easy to use.
 
 Each *.js file should work alone.
