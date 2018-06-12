@@ -13,9 +13,15 @@
 const ExpirableStorage = (() => {
     'use strict';
 
-    if (typeof ObjectStorage === 'undefined') {
-        throw new Error('module ExpirableStorage require error: <ObjectStorage>.');
+    // require
+
+    function RequireError(moduleName) {
+        return new Error(`require base module: <${moduleName}>.`);
     }
+
+    if (typeof ObjectStorage === 'undefined') throw RequireError('ObjectStorage');
+
+    // begin
 
     class ExpirableStorage {
         constructor(baseStorage) {

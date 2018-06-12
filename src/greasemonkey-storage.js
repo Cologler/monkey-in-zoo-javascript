@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name               GreasemonkeyStorage
+// @name               greasemonkey-storage
 // @namespace          https://github.com/cologler/
 // @version            0.2.0
 // @description        bring Web Storage api to Greasemonkey.
@@ -18,14 +18,14 @@ const GreasemonkeyStorage = (() => {
 
     // require
 
-    function RequireError(apiName) {
+    function GrantError(apiName) {
         return new Error(`require api <${apiName}>, please add '// @grant ${apiName}' into userscript header.`);
     }
 
-    if (typeof GM_listValues === 'undefined') throw RequireError('GM_listValues');
-    if (typeof GM_getValue === 'undefined') throw RequireError('GM_getValue');
-    if (typeof GM_setValue === 'undefined') throw RequireError('GM_setValue');
-    if (typeof GM_deleteValue === 'undefined') throw RequireError('GM_deleteValue');
+    if (typeof GM_listValues === 'undefined') throw GrantError('GM_listValues');
+    if (typeof GM_getValue === 'undefined') throw GrantError('GM_getValue');
+    if (typeof GM_setValue === 'undefined') throw GrantError('GM_setValue');
+    if (typeof GM_deleteValue === 'undefined') throw GrantError('GM_deleteValue');
 
     // begin
 
