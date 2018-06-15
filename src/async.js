@@ -39,22 +39,17 @@ const Async = (() => {
     function http(details) {
         if (typeof GM_xmlhttpRequest === 'undefined') throw GrantError('GM_xmlhttpRequest');
 
-        let resolve, reject;
-        const task = new Promise((resolve_1, reject_1) => {
-            resolve = resolve_1;
-            reject = reject_1;
-        });
-
         const options = Object.assign({}, details);
-        const onload = options.onload;
-        options.onload = args => {
-            if (onload) {
-                onload(args);
-            }
-            resolve(args);
-        };
+        const task = new Promise(resolve => {
+            const onload = options.onload;
+            options.onload = args => {
+                if (onload) {
+                    onload(args);
+                }
+                resolve(args);
+            };
+        });
         const requestResult = GM_xmlhttpRequest(options);
-
         task.abort = () => {
             requestResult.abort();
         };
