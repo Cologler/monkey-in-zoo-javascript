@@ -97,13 +97,11 @@ const EventEmitter = (() => {
         }
 
         await() {
-            let resolve;
-            const promise = new Promise(resolve_1 => {
-                resolve = resolve_1;
-            });
-            this.once(function() {
-                const args = Array.from(arguments).slice(0, -1); // ignore info because `call` always be 1.
-                resolve({ ctx: this, args });
+            const promise = new Promise(resolve => {
+                this.once(function() {
+                    const args = Array.from(arguments).slice(0, -1); // ignore info because `call` always be 1.
+                    resolve({ ctx: this, args });
+                });
             });
             return promise;
         }
