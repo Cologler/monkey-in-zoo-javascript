@@ -25,16 +25,28 @@ const EventEmitter = (() => {
         }
 
         on(func) {
+            if (typeof func !== 'function') {
+                throw new Error('func must be function');
+            }
+
             this._callbacks.push({
                 func
             });
+
+            return this;
         }
 
         once(func) {
+            if (typeof func !== 'function') {
+                throw new Error('func must be function');
+            }
+
             this._callbacks.push({
                 func,
                 once: true
             });
+
+            return this;
         }
 
         off(func) {
@@ -51,7 +63,7 @@ const EventEmitter = (() => {
             this._callbacks = [];
         }
 
-        emit(thisArg, argArray) {
+        emit(thisArg, ...argArray) {
             try {
                 for (const entity of this._callbacks) {
                     entity.func.apply(thisArg, argArray);
