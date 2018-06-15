@@ -13,10 +13,10 @@ const EventEmitter = (() => {
 
     /**
      * @typedef Callback
-     * @prop {Function} func
-     * @prop {Boolean} once
-     * @prop {Number} call the func call times
-     * @prop {Number} called the func succeed call times
+     * @prop {function} func
+     * @prop {boolean} once
+     * @prop {number} call the func call times
+     * @prop {boolean} remove whether the item should be remove.
      */
 
     class EventEmitter {
@@ -34,7 +34,6 @@ const EventEmitter = (() => {
                 func,
                 once,
                 call: 0,
-                called: 0,
             });
 
             return this;
@@ -65,16 +64,30 @@ const EventEmitter = (() => {
         emit(thisArg, ...argArray) {
             try {
                 for (const entity of this._callbacks) {
+
                     entity.call ++;
+                    const called = {};
                     argArray.push({
-                        call: entity.call
+                        call: entity.call,
+                        off: () => called.off = true,
+                        stop: () => called.stop = true
                     });
-                    entity.func.apply(thisArg, argArray);
-                    entity.called ++;
+
+                    try {
+                        entity.func.apply(thisArg, argArray);
+                    } finally {
+                        if (called.off || entity.once) {
+                            entity.remove = true;
+                        }
+                    }
+
+                    if (called.stop) {
+                        break;
+                    }
                 }
             } finally {
-                if (this._callbacks.some(z => z.once && z.called)) {
-                    this._callbacks = this._callbacks.filter(z => !(z.once && z.called));
+                if (this._callbacks.some(z => z.remove)) {
+                    this._callbacks = this._callbacks.filter(z => !z.remove);
                 }
             }
         }

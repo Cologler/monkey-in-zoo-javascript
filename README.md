@@ -16,8 +16,10 @@ ee.on(function(a, b, info) => {
     assert a === 1;
     assert b === 2;
 
-    // info is the call infos.
-    // info.call is the call times. the first time is 1 (not 0).
+    // `info` is the call infos which append by `EventEmitter`.
+    // @prop {number} call - the call times. the first time is 1 (not 0).
+    // @prop {function} off - remove the listener from EventEmitter.
+    // @prop {function} stop - stop the listeners call chain in current emit.
     assert info.call === 1;
 });
 ee.emit(0, 1, 2);
