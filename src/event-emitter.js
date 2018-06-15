@@ -15,7 +15,8 @@ const EventEmitter = (() => {
      * @typedef Callback
      * @prop {Function} func
      * @prop {Boolean} once
-     * @prop {Boolean} called
+     * @prop {Number} call the func call times
+     * @prop {Number} called the func succeed call times
      */
 
     class EventEmitter {
@@ -24,29 +25,27 @@ const EventEmitter = (() => {
             this._callbacks = [];
         }
 
-        on(func) {
-            if (typeof func !== 'function') {
-                throw new Error('func must be function');
-            }
-
-            this._callbacks.push({
-                func
-            });
-
-            return this;
-        }
-
-        once(func) {
+        _add(func, once) {
             if (typeof func !== 'function') {
                 throw new Error('func must be function');
             }
 
             this._callbacks.push({
                 func,
-                once: true
+                once,
+                call: 0,
+                called: 0,
             });
 
             return this;
+        }
+
+        on(func) {
+            return this._add(func, false);
+        }
+
+        once(func) {
+            return this._add(func, true);
         }
 
         off(func) {
@@ -66,8 +65,12 @@ const EventEmitter = (() => {
         emit(thisArg, ...argArray) {
             try {
                 for (const entity of this._callbacks) {
+                    entity.call ++;
+                    argArray.push({
+                        call: entity.call
+                    });
                     entity.func.apply(thisArg, argArray);
-                    entity.called = true;
+                    entity.called ++;
                 }
             } finally {
                 if (this._callbacks.some(z => z.once && z.called)) {
