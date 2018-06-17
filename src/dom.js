@@ -1,11 +1,16 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.2.0.4
+// @version            0.3.0.0
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
+// @license            MIT
+// @supportURL         https://github.com/Cologler/userjs-tk-javascript
 // ==/UserScript==
+
+// CDN
+// greasyfork: https://greasyfork.org/scripts/369578/code/dom.js
 
 const Dom = (() => {
     'use strict';
@@ -95,8 +100,11 @@ const Dom = (() => {
     function once(selector, callback, options = null) {
         const qee = new QueryEventEmitter(selector, options);
         qee.once(el => {
-            callback(el);
-            qee.dispose();
+            try {
+                callback(el);
+            } finally {
+                qee.dispose();
+            }
         });
         return qee;
     }

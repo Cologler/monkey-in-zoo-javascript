@@ -1,12 +1,16 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.1
+// @version            0.1.0.1
 // @description        try to take over the world!
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
 // @license            MIT
+// @supportURL         https://github.com/Cologler/userjs-tk-javascript
 // ==/UserScript==
+
+// CDN
+// greasyfork: https://greasyfork.org/scripts/369577/code/event-emitter.js
 
 const EventEmitter = (() => {
     'use strict';
