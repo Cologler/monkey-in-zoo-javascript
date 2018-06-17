@@ -24,6 +24,13 @@ const Dom = (() => {
     if (typeof EventEmitter === 'undefined') throw RequireError('event-emitter');
 
     // begin
+
+    /**
+     * @typedef Options
+     * @prop {HTMLElement} element
+     * @prop {MutationObserverInit} observerOptions
+     */
+
     class QueryEventEmitter extends EventEmitter {
         constructor (selector, options = null) {
             super();
@@ -79,9 +86,6 @@ const Dom = (() => {
     }
 
     /**
-     * @typedef Options
-     * @prop {HTMLElement} element
-     * @prop {MutationObserverInit} observerOptions
      *
      * @param {*} selector
      * @param {Options} [options=null]
@@ -91,12 +95,26 @@ const Dom = (() => {
         return new QueryEventEmitter(selector, options);
     }
 
+    /**
+     *
+     * @param {*} selector
+     * @param {function} callback
+     * @param {Options} [options=null]
+     * @returns
+     */
     function on(selector, callback, options = null) {
         const qee = new QueryEventEmitter(selector, options);
         qee.on(callback);
         return qee;
     }
 
+    /**
+     *
+     * @param {*} selector
+     * @param {function} callback
+     * @param {Options} [options=null]
+     * @returns
+     */
     function once(selector, callback, options = null) {
         const qee = new QueryEventEmitter(selector, options);
         qee.once(el => {
