@@ -65,16 +65,15 @@ const EventEmitter = (() => {
             try {
                 for (const entity of this._callbacks) {
 
-                    entity.call ++;
                     const called = {};
-                    argArray.push({
-                        call: entity.call,
+                    const args = argArray.concat({
+                        call: ++ entity.call,
                         off: () => called.off = true,
                         stop: () => called.stop = true
                     });
 
                     try {
-                        entity.func.apply(thisArg, argArray);
+                        entity.func.apply(thisArg, args);
                     } finally {
                         if (called.off || entity.once) {
                             entity.remove = true;
