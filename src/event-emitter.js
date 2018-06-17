@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.1.0.1
-// @description        try to take over the world!
+// @version            0.1.0.2
+// @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
 // @license            MIT
-// @supportURL         https://github.com/Cologler/userjs-tk-javascript
+// @supportURL         https://github.com/Cologler/monkey-in-zoo-javascript
 // ==/UserScript==
 
 // CDN

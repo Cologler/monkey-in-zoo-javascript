@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.0.0
+// @version            0.3.0.1
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
 // @license            MIT
-// @supportURL         https://github.com/Cologler/userjs-tk-javascript
+// @supportURL         https://github.com/Cologler/monkey-in-zoo-javascript
 // ==/UserScript==
 
 // CDN
