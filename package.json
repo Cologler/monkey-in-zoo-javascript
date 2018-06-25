@@ -5,10 +5,12 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "@types/greasemonkey": "0.0.28"
+    "@types/greasemonkey": "0.0.28",
+    "@types/mocha": "^5.2.3",
+    "mocha": "^5.2.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Cologler",
   "license": "MIT"

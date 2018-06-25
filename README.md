@@ -1,8 +1,9 @@
 # monkey-in-zoo
 
-**monkey-in-zoo** is a library wrap greasemonkey api for easy to use.
+Just keep monkey in zoo!
 
-* Each *.js file should work alone.
+**monkey-in-zoo** is a library wrap greasemonkey api or more.
+
 * Test on tampermonkey.
 
 ## HOW-TO-USE

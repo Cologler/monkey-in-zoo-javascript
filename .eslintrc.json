@@ -2,7 +2,8 @@
     "env": {
         "browser": true,
         "es6": true,
-        "greasemonkey": true
+        "greasemonkey": true,
+        "mocha": true
     },
     "parserOptions": {
         "ecmaFeatures": {

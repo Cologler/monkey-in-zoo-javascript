@@ -112,3 +112,18 @@ const EventEmitter = (() => {
 
     return EventEmitter;
 })();
+
+(e => {
+    if (typeof module === 'object' && module.exports) { // node
+        switch (typeof e) {
+            case 'function':
+                module.exports = {};
+                module.exports[e.name] = e;
+                break;
+
+            case 'object':
+                module.exports = e;
+                break;
+        }
+    }
+})(EventEmitter);
