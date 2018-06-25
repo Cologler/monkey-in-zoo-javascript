@@ -67,7 +67,7 @@ const EventEmitter = (() => {
 
         emit(thisArg, ...argArray) {
             try {
-                for (const entity of this._callbacks) {
+                for (const entity of this._callbacks.slice()) {
 
                     const called = {};
                     const args = argArray.concat({
@@ -79,9 +79,7 @@ const EventEmitter = (() => {
                     try {
                         entity.func.apply(thisArg, args);
                     } finally {
-                        if (called.off || entity.once) {
-                            entity.remove = true;
-                        }
+                        entity.remove = called.off || entity.once;
                     }
 
                     if (called.stop) {
@@ -108,22 +106,28 @@ const EventEmitter = (() => {
             });
             return promise;
         }
+
+        get count() {
+            return this._callbacks.length;
+        }
     }
 
     return EventEmitter;
 })();
 
-(e => {
-    if (typeof module === 'object' && module.exports) { // node
-        switch (typeof e) {
-            case 'function':
-                module.exports = {};
-                module.exports[e.name] = e;
-                break;
+(function() {
+    for (const e of arguments) {
+        if (typeof module === 'object' && module.exports) { // node
+            switch (typeof e) {
+                case 'function':
+                    module.exports = {};
+                    module.exports[e.name] = e;
+                    break;
 
-            case 'object':
-                module.exports = e;
-                break;
+                case 'object':
+                    module.exports = e;
+                    break;
+            }
         }
     }
 })(EventEmitter);
