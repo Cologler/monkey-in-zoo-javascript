@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.1.0.2
+// @version            0.2.0
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -66,6 +66,10 @@ const EventEmitter = (() => {
         }
 
         emit(thisArg, ...argArray) {
+            if (this.empty()) {
+                return false;
+            }
+
             try {
                 for (const entity of this._callbacks.slice()) {
 
@@ -91,6 +95,8 @@ const EventEmitter = (() => {
                     this._callbacks = this._callbacks.filter(z => !z.remove);
                 }
             }
+
+            return true;
         }
 
         empty() {
@@ -115,19 +121,73 @@ const EventEmitter = (() => {
     return EventEmitter;
 })();
 
+const NEventEmitter = (() => {
+    class NEventEmitter {
+        constructor() {
+            this._table = {};
+        }
+
+        _getEventEmitter(eventName, add) {
+            let ee = this._table[eventName] || null;
+            if (!ee && add) {
+                this._table[eventName] = ee = new EventEmitter();
+            }
+            return ee;
+        }
+
+        on(eventName, func) {
+            this._getEventEmitter(eventName, true).on(func);
+            return this;
+        }
+
+        once(eventName, func) {
+            this._getEventEmitter(eventName, true).once(func);
+            return this;
+        }
+
+        off(eventName, func) {
+            const ee = this._getEventEmitter(eventName, false);
+            if (ee) {
+                ee.off(func);
+                if (ee.empty()) {
+                    this._table[eventName] = null;
+                }
+            }
+            return this;
+        }
+
+        emit(eventName, thisArg, ...argArray) {
+            const ee = this._getEventEmitter(eventName, false);
+            if (ee) {
+                const ret = ee.emit(thisArg, ...argArray);
+                if (ee.empty()) {
+                    this._table[eventName] = null;
+                }
+                return ret;
+            }
+            return false;
+        }
+
+        eventNames() {
+            return Object.keys(this._table);
+        }
+    }
+
+    return NEventEmitter;
+})();
+
 (function() {
     for (const e of arguments) {
         if (typeof module === 'object' && module.exports) { // node
             switch (typeof e) {
                 case 'function':
-                    module.exports = {};
                     module.exports[e.name] = e;
                     break;
 
                 case 'object':
-                    module.exports = e;
+                    Object.assign(module.exports, e);
                     break;
             }
         }
     }
-})(EventEmitter);
+})(EventEmitter, NEventEmitter);

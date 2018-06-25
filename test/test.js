@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-describe('EventEmitter', function() {
+describe('event-emitter', function() {
 
-    const {EventEmitter} = require('../src/event-emitter');
+    const { EventEmitter } = require('../src/event-emitter');
 
     describe('#emit()', function() {
         it('should no effect if no callbacks', function() {
