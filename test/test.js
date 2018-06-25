@@ -54,6 +54,34 @@ describe('event-emitter', function() {
             ee.emit(1, 2, 3, 4);
             ee.emit(1, 2, 3, 4);
         });
+
+        it('should has return value: default is undefined', function() {
+            const ee = new EventEmitter();
+            ee.on(() => { });
+            assert.equal(ee.emit(), undefined);
+        });
+
+        it('should has return value: lastest callback return value', function() {
+            const ee = new EventEmitter();
+            ee.on(() => {
+                return 3;
+            });
+            ee.on(() => {
+                return 4;
+            });
+            assert.equal(ee.emit(), 4);
+        });
+
+        it('should has return value: pipe value one by one', function() {
+            const ee = new EventEmitter();
+            ee.on(() => {
+                return 3;
+            });
+            ee.on(info => {
+                return info.ret + 8; // 3 + 8 -> 11
+            });
+            assert.equal(ee.emit(), 11);
+        });
     });
 
     describe('#on()', function() {

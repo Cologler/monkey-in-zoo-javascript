@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.2.0
+// @version            0.3.0
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -66,9 +66,7 @@ const EventEmitter = (() => {
         }
 
         emit(thisArg, ...argArray) {
-            if (this.empty()) {
-                return false;
-            }
+            let ret = undefined;
 
             try {
                 for (const entity of this._callbacks.slice()) {
@@ -77,11 +75,12 @@ const EventEmitter = (() => {
                     const args = argArray.concat({
                         call: ++ entity.call,
                         off: () => called.off = true,
-                        stop: () => called.stop = true
+                        stop: () => called.stop = true,
+                        ret
                     });
 
                     try {
-                        entity.func.apply(thisArg, args);
+                        ret = entity.func.apply(thisArg, args);
                     } finally {
                         entity.remove = called.off || entity.once;
                     }
@@ -96,7 +95,7 @@ const EventEmitter = (() => {
                 }
             }
 
-            return true;
+            return ret;
         }
 
         empty() {
@@ -165,7 +164,7 @@ const NEventEmitter = (() => {
                 }
                 return ret;
             }
-            return false;
+            return undefined;
         }
 
         eventNames() {
