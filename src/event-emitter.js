@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.3.0
+// @version            0.3.1
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -21,6 +21,7 @@ const EventEmitter = (() => {
      * @prop {boolean} once
      * @prop {number} call the func call times
      * @prop {boolean} remove whether the item should be remove.
+     * @prop {boolean} disabled
      */
 
     class EventEmitter {
@@ -37,10 +38,20 @@ const EventEmitter = (() => {
             this._callbacks.push({
                 func,
                 once,
-                call: 0,
+                call: 0
             });
 
             return this;
+        }
+
+        _findLastIndex(func) {
+            for (let index = this._callbacks.length - 1; index >= 0; index--) {
+                const entity = this._callbacks[index];
+                if (entity.func === func) {
+                    return index;
+                }
+            }
+            return -1;
         }
 
         on(func) {
@@ -52,24 +63,39 @@ const EventEmitter = (() => {
         }
 
         off(func) {
-            for (let index = this._callbacks.length - 1; index >= 0; index--) {
-                const entity = this._callbacks[index];
-                if (entity.func === func) {
-                    this._callbacks.splice(index, 1);
-                    return;
-                }
+            const index = this._findLastIndex(func);
+            if (index >= 0) {
+                this._callbacks.splice(index, 1);
             }
+            return this;
         }
 
         offall() {
             this._callbacks = [];
+            return this;
+        }
+
+        disable(func) {
+            const index = this._findLastIndex(func);
+            if (index >= 0) {
+                this._callbacks[index].disabled = true;
+            }
+            return this;
+        }
+
+        enable(func) {
+            const index = this._findLastIndex(func);
+            if (index >= 0) {
+                this._callbacks[index].disabled = false;
+            }
+            return this;
         }
 
         emit(thisArg, ...argArray) {
             let ret = undefined;
 
             try {
-                for (const entity of this._callbacks.slice()) {
+                for (const entity of this._callbacks.filter(z => !z.disabled)) {
 
                     const called = {};
                     const args = argArray.concat({
@@ -116,7 +142,7 @@ const NEventEmitter = (() => {
             this._table = {};
         }
 
-        _getEventEmitter(eventName, add) {
+        getEventEmitter(eventName, add) {
             let ee = this._table[eventName] || null;
             if (!ee && add) {
                 this._table[eventName] = ee = new EventEmitter();
@@ -125,17 +151,17 @@ const NEventEmitter = (() => {
         }
 
         on(eventName, func) {
-            this._getEventEmitter(eventName, true).on(func);
+            this.getEventEmitter(eventName, true).on(func);
             return this;
         }
 
         once(eventName, func) {
-            this._getEventEmitter(eventName, true).once(func);
+            this.getEventEmitter(eventName, true).once(func);
             return this;
         }
 
         off(eventName, func) {
-            const ee = this._getEventEmitter(eventName, false);
+            const ee = this.getEventEmitter(eventName, false);
             if (ee) {
                 ee.off(func);
                 if (ee.empty()) {
@@ -145,8 +171,32 @@ const NEventEmitter = (() => {
             return this;
         }
 
+        offall(eventName) {
+            const ee = this.getEventEmitter(eventName, false);
+            if (ee) {
+                ee.offall();
+            }
+            return this;
+        }
+
+        disable(eventName, func) {
+            const ee = this.getEventEmitter(eventName, false);
+            if (ee) {
+                ee.disable(func);
+            }
+            return this;
+        }
+
+        enable(eventName, func) {
+            const ee = this.getEventEmitter(eventName, false);
+            if (ee) {
+                ee.enable(func);
+            }
+            return this;
+        }
+
         emit(eventName, thisArg, ...argArray) {
-            const ee = this._getEventEmitter(eventName, false);
+            const ee = this.getEventEmitter(eventName, false);
             if (ee) {
                 const ret = ee.emit(thisArg, ...argArray);
                 if (ee.empty()) {

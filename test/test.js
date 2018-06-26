@@ -150,4 +150,32 @@ describe('event-emitter', function() {
             });
         });
     });
+
+    describe('#disable()', function() {
+        it('should temp disbale callback without remove it', function() {
+            let val = 0;
+            const ee = new EventEmitter();
+            const func = () => val ++;
+            ee.on(func);
+            ee.disable(func);
+            assert.equal(ee.count, 1);
+            assert.equal(val, 0);
+            ee.emit();
+            assert.equal(val, 0);
+        });
+    });
+
+    describe('#enable()', function() {
+        it('should enable the disabled callback', function() {
+            let val = 0;
+            const ee = new EventEmitter();
+            const func = () => val ++;
+            ee.on(func);
+            ee.disable(func);
+            ee.enable(func);
+            assert.equal(val, 0);
+            ee.emit();
+            assert.equal(val, 1);
+        });
+    });
 });
