@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.0.1
+// @version            0.3.1
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -46,21 +46,60 @@ const Dom = (() => {
                 subtree: true
             };
 
+            this._invokeAt = options.invokeAt;
+            this._animationFrameQueue = null;
+            this._animationFrameHandler = null;
+
             this._observer = new MutationObserver(mrs => {
                 mrs.forEach(mr => {
                     mr.addedNodes.forEach(el => {
-                        if (typeof el.matches === 'function' && el.matches(selector) === true) {
-                            this.emit(this, el);
-                        }
-                        if (typeof el.querySelectorAll === 'function') {
-                            for (const z of el.querySelectorAll(selector)) {
-                                this.emit(this, z);
-                            }
-                        }
+                        this._onVisit(el);
                     });
                 });
             });
             this._observer.observe(this._element, observerOptions);
+        }
+
+        /**
+         *
+         *
+         * @param {Node} el
+         * @memberof QueryEventEmitter
+         */
+        _onVisit(el) {
+            if (this._invokeAt === 'AnimationFrame') {
+                this._onVisitAtAnimationFrame(el);
+            } else {
+                this._onVisitImmediately(el);
+            }
+        }
+
+        _onVisitAtAnimationFrame(el) {
+            if (this._animationFrameQueue === null) {
+                this._animationFrameQueue = [];
+                this._animationFrameHandler = requestAnimationFrame(() => {
+                    // cancel.
+                    cancelAnimationFrame(this._animationFrameHandler);
+                    this._animationFrameHandler = null;
+                    // foreach
+                    this._animationFrameQueue.forEach(z => {
+                        this._onVisitImmediately(z);
+                    });
+                    this._animationFrameQueue = null;
+                });
+            }
+            this._animationFrameQueue.push(el);
+        }
+
+        _onVisitImmediately(el) {
+            if (typeof el.matches === 'function' && el.matches(this._selector) === true) {
+                this.emit(this, el);
+            }
+            if (typeof el.querySelectorAll === 'function') {
+                for (const z of el.querySelectorAll(this._selector)) {
+                    this.emit(this, z);
+                }
+            }
         }
 
         on(func) {
