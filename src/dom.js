@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.3.1
+// @version            0.3.4
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -29,6 +29,9 @@ const Dom = (() => {
      * @typedef Options
      * @prop {HTMLElement} element
      * @prop {MutationObserverInit} observerOptions
+     * @prop {Boolean} includeTextNode
+     * @prop {String} invokeAt options canbe: 'AnimationFrame'
+     * @prop {Boolean} debug
      */
 
     class QueryEventEmitter extends EventEmitter {
@@ -40,41 +43,79 @@ const Dom = (() => {
 
             this._selector = selector;
             options = options || {};
-            this._element = options.element || document;
-            const observerOptions = options.observerOptions || {
-                childList: true,
-                subtree: true
-            };
+            /** @type {Options} */
+            this._options = Object.assign({
+                element: document,
+                observerOptions: {
+                    childList: true,
+                    subtree: true
+                }
+            }, options || {});
 
-            this._invokeAt = options.invokeAt;
             this._animationFrameQueue = null;
             this._animationFrameHandler = null;
 
             this._observer = new MutationObserver(mrs => {
                 mrs.forEach(mr => {
-                    mr.addedNodes.forEach(el => {
-                        this._onVisit(el);
-                    });
+                    if (this._options.debug) {
+                        console.debug(mr);
+                    }
+                    this._onVisitMR(mr);
                 });
             });
-            this._observer.observe(this._element, observerOptions);
+            this._observer.observe(this._options.element, this._options.observerOptions);
         }
 
         /**
          *
          *
-         * @param {Node} el
+         * @param {MutationRecord} mr
          * @memberof QueryEventEmitter
          */
-        _onVisit(el) {
-            if (this._invokeAt === 'AnimationFrame') {
-                this._onVisitAtAnimationFrame(el);
+        _onVisitMR(mr) {
+            if (mr.type === 'childList') {
+                let targetMatch = null;
+                for (const n of mr.addedNodes) {
+                    switch (n.nodeType) {
+                        case Node.TEXT_NODE:
+                            if (this._options.includeTextNode) {
+                                if (targetMatch === null) {
+                                    targetMatch = mr.target.matches && mr.target.matches(this._selector);
+                                }
+                                if (targetMatch) {
+                                    this._onEmit(n);
+                                }
+                            }
+                            break;
+
+                        case Node.ELEMENT_NODE:
+                            if (n.matches && n.matches(this._selector)) {
+                                this._onEmit(n);
+                            }
+                            if (n.querySelectorAll) {
+                                n.querySelectorAll(this._selector).forEach(z => this._onEmit(z));
+                            }
+                            break;
+                    }
+                }
             } else {
-                this._onVisitImmediately(el);
+                if (mr.target.nodeType === Node.ELEMENT_NODE) {
+                    if (mr.target.matches && mr.target.matches(this._selector)) {
+                        this._onEmit(mr.target);
+                    }
+                }
             }
         }
 
-        _onVisitAtAnimationFrame(el) {
+        _onEmit(node) {
+            if (this._options.invokeAt === 'AnimationFrame') {
+                this._emitAtAnimationFrame(node);
+            } else {
+                this._emitImmediately(node);
+            }
+        }
+
+        _emitAtAnimationFrame(el) {
             if (this._animationFrameQueue === null) {
                 this._animationFrameQueue = [];
                 this._animationFrameHandler = requestAnimationFrame(() => {
@@ -86,27 +127,20 @@ const Dom = (() => {
                     this._animationFrameHandler = null;
                     // foreach
                     queue.forEach(z => {
-                        this._onVisitImmediately(z);
+                        this._emitImmediately(z);
                     });
                 });
             }
             this._animationFrameQueue.push(el);
         }
 
-        _onVisitImmediately(el) {
-            if (typeof el.matches === 'function' && el.matches(this._selector) === true) {
-                this.emit(this, el);
-            }
-            if (typeof el.querySelectorAll === 'function') {
-                for (const z of el.querySelectorAll(this._selector)) {
-                    this.emit(this, z);
-                }
-            }
+        _emitImmediately(node) {
+            this.emit(this, node);
         }
 
         _add(func, once) {
             let call = 0;
-            for (const el of this._element.querySelectorAll(this._selector)) {
+            for (const el of this._options.element.querySelectorAll(this._selector)) {
                 call++;
                 const called = {};
                 func.call(this, el, {
