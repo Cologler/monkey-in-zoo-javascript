@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.3.1
+// @version            0.3.2
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -94,30 +94,32 @@ const EventEmitter = (() => {
         emit(thisArg, ...argArray) {
             let ret = undefined;
 
-            try {
-                for (const entity of this._callbacks.filter(z => !z.disabled)) {
+            if (this._callbacks.length > 0) {
+                try {
+                    for (const entity of this._callbacks.filter(z => !z.disabled)) {
 
-                    const called = {};
-                    const args = argArray.concat({
-                        call: ++ entity.call,
-                        off: () => called.off = true,
-                        stop: () => called.stop = true,
-                        ret
-                    });
+                        const called = {};
+                        const args = argArray.concat({
+                            call: ++ entity.call,
+                            off: () => called.off = true,
+                            stop: () => called.stop = true,
+                            ret
+                        });
 
-                    try {
-                        ret = entity.func.apply(thisArg, args);
-                    } finally {
-                        entity.remove = called.off || entity.once;
+                        try {
+                            ret = entity.func.apply(thisArg, args);
+                        } finally {
+                            entity.remove = called.off || entity.once;
+                        }
+
+                        if (called.stop) {
+                            break;
+                        }
                     }
-
-                    if (called.stop) {
-                        break;
+                } finally {
+                    if (this._callbacks.some(z => z.remove)) {
+                        this._callbacks = this._callbacks.filter(z => !z.remove);
                     }
-                }
-            } finally {
-                if (this._callbacks.some(z => z.remove)) {
-                    this._callbacks = this._callbacks.filter(z => !z.remove);
                 }
             }
 
