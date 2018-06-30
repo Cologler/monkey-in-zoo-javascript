@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.3.2
+// @version            0.3.3
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -30,7 +30,7 @@ const EventEmitter = (() => {
             this._callbacks = [];
         }
 
-        _add(func, once) {
+        _add(func, once, call = 0) {
             if (typeof func !== 'function') {
                 throw new Error('func must be function');
             }
@@ -38,7 +38,7 @@ const EventEmitter = (() => {
             this._callbacks.push({
                 func,
                 once,
-                call: 0
+                call
             });
 
             return this;
@@ -100,7 +100,7 @@ const EventEmitter = (() => {
 
                         const called = {};
                         const args = argArray.concat({
-                            call: ++ entity.call,
+                            call: entity.call ++, // first time should be 0.
                             off: () => called.off = true,
                             stop: () => called.stop = true,
                             ret

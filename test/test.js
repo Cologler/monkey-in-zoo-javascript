@@ -55,6 +55,19 @@ describe('event-emitter', function() {
             ee.emit(1, 2, 3, 4);
         });
 
+        it('should has arguments - call times', function() {
+            const ee = new EventEmitter();
+            let call = 0;
+            function cb(info) {
+                assert.equal(info.call, call);
+                call ++;
+            }
+            ee.on(cb);
+            ee.emit();
+            ee.emit();
+            assert.equal(call, 2); // total call 2 times.
+        });
+
         it('should has return value: default is undefined', function() {
             const ee = new EventEmitter();
             ee.on(() => { });

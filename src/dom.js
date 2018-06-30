@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.2
+// @version            0.3.3
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -104,21 +104,33 @@ const Dom = (() => {
             }
         }
 
-        on(func) {
+        _add(func, once) {
+            let call = 0;
             for (const el of this._element.querySelectorAll(this._selector)) {
-                func.call(this, el);
+                call++;
+                const called = {};
+                func.call(this, el, {
+                    call,
+                    off: () => called.off = true,
+                    stop: () => called.stop = true
+                });
+                if (once || called.off) {
+                    return this;
+                }
+                if (called.stop) {
+                    break;
+                }
             }
 
-            return super.on(func);
+            return super._add(func, once, call);
+        }
+
+        on(func) {
+            return this._add(func, false);
         }
 
         once(func) {
-            for (const el of this._element.querySelectorAll(this._selector)) {
-                func.call(this, el);
-                return this; // call once to remove.
-            }
-
-            return super.once(func);
+            return this._add(func, true);
         }
 
         dispose() {
