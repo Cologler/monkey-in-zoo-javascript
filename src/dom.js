@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.1
+// @version            0.3.2
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -78,14 +78,16 @@ const Dom = (() => {
             if (this._animationFrameQueue === null) {
                 this._animationFrameQueue = [];
                 this._animationFrameHandler = requestAnimationFrame(() => {
+                    // cache queue (so avoid user node change in user callback)
+                    const queue = this._animationFrameQueue;
+                    this._animationFrameQueue = null;
                     // cancel.
                     cancelAnimationFrame(this._animationFrameHandler);
                     this._animationFrameHandler = null;
                     // foreach
-                    this._animationFrameQueue.forEach(z => {
+                    queue.forEach(z => {
                         this._onVisitImmediately(z);
                     });
-                    this._animationFrameQueue = null;
                 });
             }
             this._animationFrameQueue.push(el);
