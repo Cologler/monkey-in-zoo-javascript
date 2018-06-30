@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.3
+// @version            0.3.3.1
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -9,8 +9,8 @@
 // @supportURL         https://github.com/Cologler/monkey-in-zoo-javascript
 // ==/UserScript==
 
-// CDN
-// greasyfork: https://greasyfork.org/scripts/369578/code/dom.js
+// hosting on github: https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/dom.js
+// hosting on greasyfork: https://greasyfork.org/scripts/369578/code/dom.js
 
 const Dom = (() => {
     'use strict';

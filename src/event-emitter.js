@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.3.3
+// @version            0.3.3.1
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -9,8 +9,8 @@
 // @supportURL         https://github.com/Cologler/monkey-in-zoo-javascript
 // ==/UserScript==
 
-// CDN
-// greasyfork: https://greasyfork.org/scripts/369577/code/event-emitter.js
+// hosting on github: https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/event-emitter.js
+// hosting on greasyfork: https://greasyfork.org/scripts/369577/code/event-emitter.js
 
 const EventEmitter = (() => {
     'use strict';
