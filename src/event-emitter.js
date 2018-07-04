@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               event-emitter
 // @namespace          https://github.com/cologler/
-// @version            0.3.3.1
+// @version            0.3.4
 // @description        a simplest event emitter.
 // @author             cologler (skyoflw@gmail.com)
 // @grant              none
@@ -103,7 +103,8 @@ const EventEmitter = (() => {
                             call: entity.call ++, // first time should be 0.
                             off: () => called.off = true,
                             stop: () => called.stop = true,
-                            ret
+                            ret,
+                            emitter: this,
                         });
 
                         try {

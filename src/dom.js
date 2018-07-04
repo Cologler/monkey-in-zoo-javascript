@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               dom
 // @namespace          https://github.com/cologler/
-// @version            0.3.4
+// @version            0.3.5
 // @description        provide some function to handle element by selector.
 // @author             cologler
 // @grant              none
@@ -146,7 +146,9 @@ const Dom = (() => {
                 func.call(this, el, {
                     call,
                     off: () => called.off = true,
-                    stop: () => called.stop = true
+                    stop: () => called.stop = true,
+                    ret: undefined,
+                    emitter: this,
                 });
                 if (once || called.off) {
                     return this;

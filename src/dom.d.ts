@@ -13,6 +13,7 @@ declare namespace Dom {
         off();
         stop();
         readonly ret: R;
+        readonly emitter: QueryEventEmitter;
     }
 
     type Func<E, R> = (node: E|Node, info: EventEmitterInfo<R>) => R;
