@@ -8,15 +8,15 @@ declare namespace Dom {
         debug: boolean;
     }
 
-    class EventEmitterInfo<R> {
+    class EventEmitterInfo<E extends Element, R> {
         readonly call: number;
         off();
         stop();
         readonly ret: R;
-        readonly emitter: QueryEventEmitter;
+        readonly emitter: QueryEventEmitter<E>;
     }
 
-    type Func<E, R> = (node: E|Node, info: EventEmitterInfo<R>) => R;
+    type Func<E extends Element, R> = (this: QueryEventEmitter<E>, node: E|Node, info: EventEmitterInfo<E, R>) => R;
 
     class QueryEventEmitter<E extends Element> {
         on(func: Func<E, any>): any;
@@ -64,5 +64,3 @@ declare namespace Dom {
         options?: QueryEventEmitterOptions)
         : QueryEventEmitter<E>;
 }
-
-
