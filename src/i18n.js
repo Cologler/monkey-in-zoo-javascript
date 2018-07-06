@@ -1,14 +1,15 @@
 // ==UserScript==
 // @name               i18n
 // @namespace          https://github.com/Cologler/
-// @version            0.1.0.1
+// @version            0.1.0.2
 // @description        i18n for greasemonkey info.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              none
 // @license            MIT
 // ==/UserScript==
 
-// hosting on Github: https://raw.githubusercontent.com/Cologler/monkey-in-zoo-javascript/master/src/i18n.js
+// hosting on Github:       https://raw.githubusercontent.com/Cologler/monkey-in-zoo-javascript/master/src/i18n.js
+// hosting on GreasyFork:   https://greasyfork.org/scripts/370084-i18n/code/i18n.js
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
