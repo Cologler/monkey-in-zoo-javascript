@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               value
 // @namespace          https://github.com/Cologler/
-// @version            0.1.1
+// @version            0.2
 // @description        wrap GM_getValue/... apis.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              GM_getValue
@@ -37,9 +37,18 @@ const value = (() => {
     // begin
 
     class Of {
+        /**
+         * @param {string} key
+         * @param {any} defval
+         * @memberof Of
+         */
         constructor(key, defval) {
             this._key = key;
             this._defval = defval;
+        }
+
+        then(key, defval) {
+            return new OfObject(this, key, defval);
         }
 
         get() {
@@ -69,6 +78,43 @@ const value = (() => {
                     GM_removeValueChangeListener(handler);
                 }
             };
+        }
+    }
+
+    class OfObject {
+        constructor(src, key, defval) {
+            if (!(src instanceof Of || src instanceof OfObject)) {
+                throw new Error('src must be Of or OfObject');
+            }
+
+            this._src = src;
+            this._key = key;
+            this._defval = defval;
+        }
+
+        then(key, defval) {
+            return new OfObject(this, key, defval);
+        }
+
+        get() {
+            const obj = this._src.get();
+            if (obj.hasOwnProperty(this._key)) {
+                return obj[this._key];
+            } else {
+                return this._defval;
+            }
+        }
+
+        set(val) {
+            const obj = this._src.get();
+            obj[this._key] = val;
+            this._src.set(obj);
+        }
+
+        del() {
+            const obj = this._src.get();
+            delete obj[this._key];
+            this._src.set(obj);
         }
     }
 
