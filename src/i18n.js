@@ -1,15 +1,14 @@
 // ==UserScript==
 // @name               i18n
 // @namespace          https://github.com/Cologler/
-// @version            0.1
+// @version            0.1.0.1
 // @description        i18n for greasemonkey info.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              none
 // @license            MIT
 // ==/UserScript==
 
-// this lib was hosting on ??.
-// you can just require:
+// hosting on Github: https://raw.githubusercontent.com/Cologler/monkey-in-zoo-javascript/master/src/i18n.js
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
