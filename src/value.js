@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               value
 // @namespace          https://github.com/Cologler/
-// @version            0.2
+// @version            0.2.1
 // @description        wrap GM_getValue/... apis.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              GM_getValue
@@ -127,6 +127,6 @@ const value = (() => {
     }
 
     return {
-        of: ValueOfGM
+        of
     };
 })();
