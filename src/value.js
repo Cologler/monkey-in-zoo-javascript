@@ -36,7 +36,7 @@ const value = (() => {
 
     // begin
 
-    class Of {
+    class ValueOfGM {
         /**
          * @param {string} key
          * @param {any} defval
@@ -48,7 +48,7 @@ const value = (() => {
         }
 
         then(key, defval) {
-            return new OfObject(this, key, defval);
+            return new PropOfObject(this, key, defval);
         }
 
         get() {
@@ -81,10 +81,10 @@ const value = (() => {
         }
     }
 
-    class OfObject {
+    class PropOfObject {
         constructor(src, key, defval) {
-            if (!(src instanceof Of || src instanceof OfObject)) {
-                throw new Error('src must be Of or OfObject');
+            if (!(src instanceof ValueOfGM || src instanceof PropOfObject)) {
+                throw new Error('src must be ValueOfGM or PropOfObject');
             }
 
             this._src = src;
@@ -93,7 +93,7 @@ const value = (() => {
         }
 
         then(key, defval) {
-            return new OfObject(this, key, defval);
+            return new PropOfObject(this, key, defval);
         }
 
         get() {
@@ -118,7 +118,15 @@ const value = (() => {
         }
     }
 
+    /**
+     * @param {string} key
+     * @param {any} defval
+     */
+    function of(key, defval) {
+        return new ValueOfGM(key, defval);
+    }
+
     return {
-        of: Of
+        of: ValueOfGM
     };
 })();
