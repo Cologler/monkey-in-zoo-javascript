@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               value
 // @namespace          https://github.com/Cologler/
-// @version            0.1
+// @version            0.1.1
 // @description        wrap GM_getValue/... apis.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              GM_getValue
@@ -13,8 +13,7 @@
 // @license            MIT
 // ==/UserScript==
 
-// this lib was hosting on ??.
-// you can just require:
+// hosting on Github: https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/value.js
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
@@ -51,13 +50,19 @@ const value = (() => {
             GM_setValue(this._key, val);
         }
 
-        def() {
+        del() {
             GM_deleteValue(this._key);
         }
 
+        /**
+         * @typedef {(number|string|boolean)} value
+         *
+         * @param {(name: string, old_value: value, new_value: value, remote: boolean) => {}} callback
+         * @returns
+         * @memberof Of
+         * @desc remote is boolean that shows whether this value was modified from the instance of another tab
+         */
         onChanged(callback) {
-            // callback:  function(name, old_value, new_value, remote)
-            // remote is boolean that shows whether this value was modified from the instance of another tab
             const handler = GM_addValueChangeListener(this.key, callback);
             return {
                 dispose: () => {
