@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               value
 // @namespace          https://github.com/Cologler/
-// @version            0.2.1
+// @version            0.2.1.1
 // @description        wrap GM_getValue/... apis.
 // @author             Cologler (skyoflw@gmail.com)
 // @grant              GM_getValue
@@ -13,7 +13,8 @@
 // @license            MIT
 // ==/UserScript==
 
-// hosting on Github: https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/value.js
+// hosting on Github:       https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/value.js
+// hosting on GreasyFork:   https://greasyfork.org/scripts/370079/code/value.js
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
