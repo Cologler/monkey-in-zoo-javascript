@@ -90,7 +90,11 @@ const value = (() => {
 
             this._src = src;
             this._key = key;
-            this._defval = defval;
+            if (defval instanceof ValueOfGM || defval instanceof PropOfObject) {
+                this._defvalFactory = defval;
+            } else {
+                this._defval = defval;
+            }
         }
 
         then(key, defval) {
@@ -101,6 +105,8 @@ const value = (() => {
             const obj = this._src.get();
             if (obj.hasOwnProperty(this._key)) {
                 return obj[this._key];
+            } else if (this._defvalFactory) {
+                return this._defvalFactory.get();
             } else {
                 return this._defval;
             }
