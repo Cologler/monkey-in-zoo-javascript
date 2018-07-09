@@ -9,8 +9,9 @@
 // @supportURL         https://github.com/Cologler/monkey-in-zoo-javascript
 // ==/UserScript==
 
-// hosting on github: https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/event-emitter.js
-// hosting on greasyfork: https://greasyfork.org/scripts/369577/code/event-emitter.js
+// hosting on GitHub:       https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/event-emitter.js
+// hosting on jsDelivr:     https://cdn.jsdelivr.net/gh/Cologler/monkey-in-zoo-javascript/src/event-emitter.js
+// hosting on GreasyFork:   https://greasyfork.org/scripts/369577/code/event-emitter.js
 
 const EventEmitter = (() => {
     'use strict';
