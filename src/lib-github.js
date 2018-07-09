@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                lib-github
 // @namespace           https://github.com/Cologler/
-// @version             0.1.1
+// @version             0.1.2
 // @description         a lib for easily add feature to GitHub.
 // @author              Cologler (skyoflw@gmail.com)
 // @grant               none
@@ -93,7 +93,7 @@ const github = (() => {
                         }
                         a = db.el('a', {
                             class: ['btn', 'btn-sm', 'BtnGroup-item'],
-                            attrs: { href: action.url }
+                            attrs: { href: url }
                         }, action.text).get();
                         break;
 
