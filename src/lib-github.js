@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                lib-github
 // @namespace           https://github.com/Cologler/
-// @version             0.1
+// @version             0.1.1
 // @description         a lib for easily add feature to GitHub.
 // @author              Cologler (skyoflw@gmail.com)
 // @grant               none
@@ -11,7 +11,9 @@
 
 // require: event-emitter, dom, dom-builder
 
-// hosting on ??.
+// hosting on GitHub:
+// hosting on jsDelivr:     https://cdn.jsdelivr.net/gh/Cologler/monkey-in-zoo-javascript/src/lib-github.js
+// hosting on GreasyFork:
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
@@ -85,6 +87,10 @@ const github = (() => {
                 let a = null;
                 switch (action.type) {
                     case 'anchor':
+                        let url = action.url;
+                        if (typeof url === 'function') {
+                            url = url(node);
+                        }
                         a = db.el('a', {
                             class: ['btn', 'btn-sm', 'BtnGroup-item'],
                             attrs: { href: action.url }
@@ -103,6 +109,10 @@ const github = (() => {
             }
         }
 
+        /**
+         * @param {string} text
+         * @param {string|(() => string)} url
+         */
         addAnchor(text, url) {
             this._actions.push({ type: 'anchor', text, url });
             return this;
@@ -133,6 +143,6 @@ const github = (() => {
 /*
 Example:
 
-github.file({ type: ['css', 'javascript'] }).addAnchor('open', 'THE URL').apply();
+github.file({ type: ['css', 'javascript'] }).addAnchor('open', () => 'URL').apply();
 github.file({ type: 'css' }).addButton('copy', () => { }).apply();
 */
