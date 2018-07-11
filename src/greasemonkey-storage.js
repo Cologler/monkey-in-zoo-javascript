@@ -18,14 +18,28 @@ const GreasemonkeyStorage = (() => {
 
     // require
 
-    function GrantError(apiName) {
-        return new Error(`require api <${apiName}>, please add '// @grant ${apiName}' into userscript header.`);
-    }
+    (() => {
+        function require(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require base module: <${name}>.`);
+            }
+        }
 
-    if (typeof GM_listValues === 'undefined') throw GrantError('GM_listValues');
-    if (typeof GM_getValue === 'undefined') throw GrantError('GM_getValue');
-    if (typeof GM_setValue === 'undefined') throw GrantError('GM_setValue');
-    if (typeof GM_deleteValue === 'undefined') throw GrantError('GM_deleteValue');
+        function grant(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
+            }
+        }
+
+        (function(errors) {
+            errors.filter(z => z).forEach(z => { throw z; });
+        })([
+            grant(typeof GM_listValues, 'GM_listValues'),
+            grant(typeof GM_getValue, 'GM_getValue'),
+            grant(typeof GM_setValue, 'GM_setValue'),
+            grant(typeof GM_deleteValue, 'GM_deleteValue'),
+        ]);
+    })();
 
     // begin
 

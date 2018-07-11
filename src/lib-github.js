@@ -21,9 +21,27 @@
 const github = (() => {
     'use strict';
 
-    if (typeof DomBuilder === 'undefined') {
-        throw new Error('require dom-builder module');
-    }
+    (() => {
+        function require(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require base module: <${name}>.`);
+            }
+        }
+
+        function grant(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
+            }
+        }
+
+        (function(errors) {
+            errors.filter(z => z).forEach(z => { throw z; });
+        })([
+            require(typeof EventEmitter, 'event-emitter'),
+            require(typeof Dom, 'dom'),
+            require(typeof DomBuilder, 'dom-builder'),
+        ]);
+    })();
 
     const LANGUAGE_ALIAS = {
         'js': 'javascript',

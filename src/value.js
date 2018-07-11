@@ -22,20 +22,30 @@
 const value = (() => {
     'use strict';
 
-    // require
+    (() => {
+        function require(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require base module: <${name}>.`);
+            }
+        }
 
-    function GrantError(apiName) {
-        return new Error(`require api <${apiName}>, please add '// @grant ${apiName}' into userscript header.`);
-    }
+        function grant(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
+            }
+        }
 
-    if (typeof GM_getValue === 'undefined') throw GrantError('GM_getValue');
-    if (typeof GM_setValue === 'undefined') throw GrantError('GM_setValue');
-    if (typeof GM_deleteValue === 'undefined') throw GrantError('GM_deleteValue');
-    if (typeof GM_listValues === 'undefined') throw GrantError('GM_listValues');
-    if (typeof GM_addValueChangeListener === 'undefined') throw GrantError('GM_addValueChangeListener');
-    if (typeof GM_removeValueChangeListener === 'undefined') throw GrantError('GM_removeValueChangeListener');
-
-    // begin
+        (function(errors) {
+            errors.filter(z => z).forEach(z => { throw z; });
+        })([
+            grant(typeof GM_listValues, 'GM_listValues'),
+            grant(typeof GM_getValue, 'GM_getValue'),
+            grant(typeof GM_setValue, 'GM_setValue'),
+            grant(typeof GM_deleteValue, 'GM_deleteValue'),
+            grant(typeof GM_addValueChangeListener, 'GM_addValueChangeListener'),
+            grant(typeof GM_removeValueChangeListener, 'GM_removeValueChangeListener'),
+        ]);
+    })();
 
     class ValueOfGM {
         /**

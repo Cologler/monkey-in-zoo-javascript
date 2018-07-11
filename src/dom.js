@@ -16,15 +16,25 @@
 const Dom = (() => {
     'use strict';
 
-    // require
+    (() => {
+        function require(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require base module: <${name}>.`);
+            }
+        }
 
-    function RequireError(moduleName) {
-        return new Error(`require base module: <${moduleName}>.`);
-    }
+        function grant(type, name) {
+            if (type === 'undefined') {
+                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
+            }
+        }
 
-    if (typeof EventEmitter === 'undefined') throw RequireError('event-emitter');
-
-    // begin
+        (function(errors) {
+            errors.filter(z => z).forEach(z => { throw z; });
+        })([
+            require(typeof EventEmitter, 'event-emitter'),
+        ]);
+    })();
 
     /**
      * @typedef Options
