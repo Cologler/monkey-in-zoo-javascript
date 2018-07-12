@@ -36,19 +36,43 @@ const Dom = (() => {
         ]);
     })();
 
+    class AnimationFrameEventEmitter extends EventEmitter {
+        constructor() {
+            super();
+            this._queue = null;
+            this._handler = null;
+        }
+
+        emit(self, node) {
+            if (this._queue === null) {
+                this._queue = [];
+                this._handler = requestAnimationFrame(() => {
+                    // cache queue (so avoid user node change in user callback)
+                    const queue = this._queue;
+                    this._queue = null;
+                    // cancel.
+                    cancelAnimationFrame(this._handler);
+                    this._handler = null;
+                    // foreach
+                    queue.forEach(z => {
+                        super.emit(self, z);
+                    });
+                });
+            }
+            this._queue.push(node);
+        }
+    }
+
     /**
      * @typedef Options
      * @prop {HTMLElement} element
      * @prop {MutationObserverInit} observerOptions
      * @prop {Boolean} includeTextNode
-     * @prop {String} invokeAt options canbe: 'AnimationFrame'
+     * @prop {null|'AnimationFrame'} invokeAt options canbe: 'AnimationFrame'
      * @prop {Boolean} debug
      */
-
-    class QueryEventEmitter extends EventEmitter {
+    class QueryEventEmitter {
         constructor (selector, options = null) {
-            super();
-
             if (typeof selector !== 'string') throw new Error('selector must be string.');
             if (typeof options !== 'object') throw new Error('options must be object.');
 
@@ -63,8 +87,15 @@ const Dom = (() => {
                 }
             }, options || {});
 
-            this._animationFrameQueue = null;
-            this._animationFrameHandler = null;
+            switch (this._options.invokeAt) {
+                case 'AnimationFrame':
+                    this._baseEventEmitter = new AnimationFrameEventEmitter();
+                    break;
+
+                default:
+                    this._baseEventEmitter = new EventEmitter();
+                    break;
+            }
 
             this._observer = new MutationObserver(mrs => {
                 mrs.forEach(mr => {
@@ -94,17 +125,17 @@ const Dom = (() => {
                                     targetMatch = mr.target.matches && mr.target.matches(this._selector);
                                 }
                                 if (targetMatch) {
-                                    this._onEmit(n);
+                                    this._emit(n);
                                 }
                             }
                             break;
 
                         case Node.ELEMENT_NODE:
                             if (n.matches && n.matches(this._selector)) {
-                                this._onEmit(n);
+                                this._emit(n);
                             }
                             if (n.querySelectorAll) {
-                                n.querySelectorAll(this._selector).forEach(z => this._onEmit(z));
+                                n.querySelectorAll(this._selector).forEach(z => this._emit(z));
                             }
                             break;
                     }
@@ -112,41 +143,14 @@ const Dom = (() => {
             } else {
                 if (mr.target.nodeType === Node.ELEMENT_NODE) {
                     if (mr.target.matches && mr.target.matches(this._selector)) {
-                        this._onEmit(mr.target);
+                        this._emit(mr.target);
                     }
                 }
             }
         }
 
-        _onEmit(node) {
-            if (this._options.invokeAt === 'AnimationFrame') {
-                this._emitAtAnimationFrame(node);
-            } else {
-                this._emitImmediately(node);
-            }
-        }
-
-        _emitAtAnimationFrame(el) {
-            if (this._animationFrameQueue === null) {
-                this._animationFrameQueue = [];
-                this._animationFrameHandler = requestAnimationFrame(() => {
-                    // cache queue (so avoid user node change in user callback)
-                    const queue = this._animationFrameQueue;
-                    this._animationFrameQueue = null;
-                    // cancel.
-                    cancelAnimationFrame(this._animationFrameHandler);
-                    this._animationFrameHandler = null;
-                    // foreach
-                    queue.forEach(z => {
-                        this._emitImmediately(z);
-                    });
-                });
-            }
-            this._animationFrameQueue.push(el);
-        }
-
-        _emitImmediately(node) {
-            this.emit(this, node);
+        _emit(node) {
+            this._baseEventEmitter.emit(this, node);
         }
 
         _add(func, once) {
@@ -169,7 +173,7 @@ const Dom = (() => {
                 }
             }
 
-            return super._add(func, once, call);
+            return this._baseEventEmitter._add(func, once, call);
         }
 
         on(func) {
