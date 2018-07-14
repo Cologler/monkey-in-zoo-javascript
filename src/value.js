@@ -85,6 +85,17 @@ const value = (() => {
         cache() {
             return new CachedValue(this);
         }
+
+        /**
+         * @memberof Value
+         * @return {PropertyDescriptor}
+         */
+        asPropertyDescriptor() {
+            return {
+                get: () => this.get(),
+                set: val => this.set(val)
+            };
+        }
     }
 
     class ValueOfGM extends Value {
