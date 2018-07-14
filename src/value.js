@@ -23,12 +23,6 @@ const value = (() => {
     'use strict';
 
     (() => {
-        function require(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require base module: <${name}>.`);
-            }
-        }
-
         function grant(type, name) {
             if (type === 'undefined') {
                 return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
@@ -47,19 +41,62 @@ const value = (() => {
         ]);
     })();
 
-    class ValueOfGM {
+    class Value {
+        /**
+         * @memberof Value
+         * @abstract
+         * @return {any}
+         */
+        get() {
+            throw new Error();
+        }
+
+        /**
+         *
+         *
+         * @param {*} value
+         * @memberof Value
+         * @abstract
+         */
+        set(value) {
+            throw new Error();
+        }
+
+        /**
+         *
+         *
+         * @memberof Value
+         * @abstract
+         */
+        del() {
+            throw new Error();
+        }
+
+        /**
+         * @param {PropertyKey} key
+         * @param {*} defval
+         * @returns
+         * @memberof BaseValue
+         */
+        then(key, defval) {
+            return new PropOfObject(this, key, defval);
+        }
+
+        cache() {
+            return new CachedValue(this);
+        }
+    }
+
+    class ValueOfGM extends Value {
         /**
          * @param {string} key
          * @param {any} defval
          * @memberof Of
          */
         constructor(key, defval) {
+            super();
             this._key = key;
             this._defval = defval;
-        }
-
-        then(key, defval) {
-            return new PropOfObject(this, key, defval);
         }
 
         get() {
@@ -92,23 +129,24 @@ const value = (() => {
         }
     }
 
-    class PropOfObject {
+    class PropOfObject extends Value {
+        /**
+         * Creates an instance of PropOfObject.
+         * @param {Value} src
+         * @param {*} key
+         * @param {*} defval
+         * @memberof PropOfObject
+         */
         constructor(src, key, defval) {
-            if (!(src instanceof ValueOfGM || src instanceof PropOfObject)) {
-                throw new Error('src must be ValueOfGM or PropOfObject');
-            }
+            super();
 
             this._src = src;
             this._key = key;
-            if (defval instanceof ValueOfGM || defval instanceof PropOfObject) {
+            if (defval instanceof Value) {
                 this._defvalFactory = defval;
             } else {
                 this._defval = defval;
             }
-        }
-
-        then(key, defval) {
-            return new PropOfObject(this, key, defval);
         }
 
         get() {
@@ -132,6 +170,66 @@ const value = (() => {
             const obj = this._src.get();
             delete obj[this._key];
             this._src.set(obj);
+        }
+    }
+
+    /**
+     * @class ValueWrapper
+     * @extends {Value}
+     * @abstract
+     */
+    class ValueWrapper extends Value {
+        /**
+         * Creates an instance of CachedValue.
+         * @param {Value} baseValue
+         * @memberof CachedValue
+         */
+        constructor(baseValue) {
+            super();
+            this._baseValue = baseValue;
+        }
+
+        get() {
+            return this._baseValue.get();
+        }
+
+        set(value) {
+            return this._baseValue.set(value);
+        }
+
+        del() {
+            return this._baseValue.del();
+        }
+    }
+
+    class CachedValue extends ValueWrapper {
+        /**
+         * Creates an instance of CachedValue.
+         * @param {Value} baseValue
+         * @memberof CachedValue
+         */
+        constructor(baseValue) {
+            super(baseValue);
+            this._isCached = false;
+            this._value = null;
+        }
+
+        get() {
+            if (!this._isCached) {
+                this._isCached = true;
+                this._value = super.get();
+            }
+            return this._value;
+        }
+
+        set(value) {
+            this._isCached = true;
+            this._value = value;
+            super.set(value);
+        }
+
+        refresh() {
+            this._isCached = false;
         }
     }
 
