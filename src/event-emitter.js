@@ -169,7 +169,7 @@ const NEventEmitter = (() => {
             if (ee) {
                 ee.off(func);
                 if (ee.empty()) {
-                    this._table[eventName] = null;
+                    delete this._table[eventName];
                 }
             }
             return this;
@@ -178,7 +178,7 @@ const NEventEmitter = (() => {
         offall(eventName) {
             const ee = this.getEventEmitter(eventName, false);
             if (ee) {
-                ee.offall();
+                delete this._table[eventName];
             }
             return this;
         }
@@ -204,7 +204,7 @@ const NEventEmitter = (() => {
             if (ee) {
                 const ret = ee.emit(thisArg, ...argArray);
                 if (ee.empty()) {
-                    this._table[eventName] = null;
+                    delete this._table[eventName];
                 }
                 return ret;
             }
