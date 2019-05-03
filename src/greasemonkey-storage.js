@@ -1,47 +1,19 @@
-// ==UserScript==
-// @name               greasemonkey-storage
-// @namespace          https://github.com/cologler/
-// @version            0.2.0
-// @description        bring Web Storage api to Greasemonkey.
-// @author             cologler
-// @grant              GM_listValues
-// @grant              GM_getValue
-// @grant              GM_setValue
-// @grant              GM_deleteValue
-// ==/UserScript==
+/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
 
-// CDN
-// greasyfork:
+/**
+ * GreasemonkeyStorage implements Storage interface,
+ * which allow you get or set value by:
+ *   - GM_getValue
+ *   - GM_setValue
+ *   - GM_deleteValue
+ *   - GM_listValues
+ * You may need to grant above GM permissions for GreasemonkeyStorage.
+ *
+ */
 
-const GreasemonkeyStorage = (() => {
+// eslint-disable-next-line no-unused-vars
+const greasemonkeyStorage = (() => {
     'use strict';
-
-    // require
-
-    (() => {
-        function require(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require base module: <${name}>.`);
-            }
-        }
-
-        function grant(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
-            }
-        }
-
-        (function(errors) {
-            errors.filter(z => z).forEach(z => { throw z; });
-        })([
-            grant(typeof GM_listValues, 'GM_listValues'),
-            grant(typeof GM_getValue, 'GM_getValue'),
-            grant(typeof GM_setValue, 'GM_setValue'),
-            grant(typeof GM_deleteValue, 'GM_deleteValue'),
-        ]);
-    })();
-
-    // begin
 
     class GreasemonkeyStorage {
         get length() {
