@@ -1,15 +1,12 @@
-// ==UserScript==
-// @name               object-storage
-// @namespace          https://github.com/cologler/
-// @version            0.2.0
-// @description        allow web storage api save objects.
-// @author             cologler
-// @grant              none
-// ==/UserScript==
+/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
 
-// CDN
-// greasyfork:
+/**
+ * ObjectStorage implements Storage interface,
+ * which allow you store object in json string.
+ *
+ */
 
+// eslint-disable-next-line no-unused-vars
 const ObjectStorage = (() => {
     'use strict';
 
@@ -28,7 +25,11 @@ const ObjectStorage = (() => {
             let val = this._baseStorage.getItem(k);
             if (val !== null) {
                 if (!this._baseStorage.supportObject) {
-                    val = JSON.parse(val);
+                    try {
+                        return JSON.parse(val);
+                    } catch (_) {
+                        return val;
+                    }
                 }
             }
             return val;
