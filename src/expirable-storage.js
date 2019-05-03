@@ -1,44 +1,36 @@
-// ==UserScript==
-// @name               expirable-storage
-// @namespace          https://github.com/cologler/
-// @version            0.2.0
-// @description        allow web storage api save data with expires.
-// @author             cologler
-// @grant              none
-// ==/UserScript==
+/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
 
-// CDN
-// greasyfork:
+/**
+ * ExpirableStorage implements Storage interface,
+ * allow you to get or set value with expired times.
+ *
+ * to use this ExpirableStorage, you need to requires:
+ * - object-storage
+ *
+ */
 
+// eslint-disable-next-line no-unused-vars
 const ExpirableStorage = (() => {
     'use strict';
 
-    (() => {
-        function require(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require base module: <${name}>.`);
-            }
-        }
-
-        function grant(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
-            }
-        }
-
-        (function(errors) {
-            errors.filter(z => z).forEach(z => { throw z; });
-        })([
-            require(typeof ObjectStorage, 'object-storage'),
-        ]);
-    })();
+    const ID_LAST_CLEAR = '__expirable_storage_last_clear__';
 
     class ExpirableStorage {
-        constructor(baseStorage) {
+        constructor(baseStorage, autoClearMS = 86400 * 1000) {
+            if (typeof autoClearMS !== 'number') {
+                throw Error('autoClearMS should be a number');
+            }
+
             if (!baseStorage.supportObject) {
+                // eslint-disable-next-line no-undef
                 baseStorage = new ObjectStorage(baseStorage);
             }
             this._baseStorage = baseStorage;
+            this._autoClearMS = autoClearMS;
+
+            if (!this.getItem(ID_LAST_CLEAR)) {
+                this.clearExpired();
+            }
         }
 
         get length() { return this._baseStorage.length; }
@@ -50,45 +42,46 @@ const ExpirableStorage = (() => {
         }
 
         getItem(k) {
-            let val = this.getEntity(k);
-            if (val && !val.isExpired) {
-                return val.content;
+            let entry = this._getEntry(k);
+            if (entry && !entry.isExpired) {
+                return entry.content;
             }
             return null;
         }
 
-        getEntity(k, removeExpired = true) {
-            const data = this._baseStorage.getItem(k);
-            if (data) {
-                const ret = {
-                    isExpired: !(data.expiresAt === undefined || new Date().getTime() < data.expiresAt),
-                    content: data.content
-                };
-                if (ret.isExpired && removeExpired) {
-                    this._baseStorage.removeItem(k);
-                }
-                return ret;
+        _getEntry(k, removeExpired = true) {
+            const entry = this._baseStorage.getItem(k);
+            if (!entry) {
+                return entry;
             }
-            return null;
+
+            const filledEntry = {
+                isExpired: !(entry.expiresAt === undefined || new Date().getTime() < entry.expiresAt),
+                content: entry.content
+            };
+            if (filledEntry.isExpired && removeExpired) {
+                this._baseStorage.removeItem(k);
+            }
+            return filledEntry;
         }
 
         setItem(k, v, expiresAtTime=undefined) {
             if (expiresAtTime !== undefined) {
                 if (!Number.isSafeInteger(expiresAtTime)) {
-                    throw new Error('expiresAtTime must be number.');
+                    throw new Error('expiresAtTime must be a number');
                 }
             }
 
-            const data = {
+            const entry = {
                 content: v,
                 expiresAt: expiresAtTime
             };
-            return this._baseStorage.setItem(k, data);
+            return this._baseStorage.setItem(k, entry);
         }
 
         setItemExpiresAfter(k, v, expiresAfterMS) {
             if (!Number.isSafeInteger(expiresAfterMS)) {
-                throw new Error('expiresAfterMS must be number.');
+                throw new Error('expiresAfterMS must be a number');
             }
 
             return this.setItem(k, v, (new Date().getTime() + expiresAfterMS));
@@ -99,9 +92,9 @@ const ExpirableStorage = (() => {
         clear() { return this._baseStorage.clear(); }
 
         clearExpired() {
-            let keys = null;
+            let keys;
             if (this._baseStorage.keys) {
-                keys = this._baseStorage.keys();
+                keys = Array.from(this._baseStorage.keys());
             } else {
                 keys = [];
                 const len = this._baseStorage.length;
@@ -109,11 +102,13 @@ const ExpirableStorage = (() => {
                     keys.push(this._baseStorage.key(i));
                 }
             }
-            keys.forEach(k => {
+            for (const k of keys) {
                 try {
-                    this.getEntity(k);
+                    this._getEntry(k);
                 } catch (error) { /* ignore json parse error */ }
-            });
+            }
+
+            this.setItemExpiresAfter(ID_LAST_CLEAR, true, this._autoClearMS);
         }
     }
 
