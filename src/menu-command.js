@@ -1,71 +1,75 @@
-// ==UserScript==
-// @name               menu-command
-// @namespace          https://github.com/cologler/
-// @version            0.1
-// @description        try to take over the world!
-// @author             cologler (skyoflw@gmail.com)
-// @grant              none
-// @license            MIT
-// ==/UserScript==
+/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
 
-// this lib was hosting on ??.
-// you can just require:
+/**
+ * MenuCommand provide a OOP way to use GM_MenuCommand API.
+ *
+ * You may need to grant following GM permissions for MenuCommand:
+ * - GM_registerMenuCommand
+ * - GM_unregisterMenuCommand
+ *
+ */
 
-// just let type script work.
-(function() { function require(){}; require("greasemonkey"); })();
-
+// eslint-disable-next-line no-unused-vars
 const MenuCommand = (() => {
     'use strict';
 
-    // require
-
-    function GrantError(apiName) {
-        return new Error(`require api <${apiName}>, please add '// @grant ${apiName}' into userscript header.`);
-    }
-
-    if (typeof GM_registerMenuCommand === 'undefined') throw GrantError('GM_registerMenuCommand');
-    if (typeof GM_unregisterMenuCommand === 'undefined') throw GrantError('GM_unregisterMenuCommand');
-
-    // begin
-
     class MenuCommand {
         constructor() {
-            this._caption = null;
+            this._caption = '';
             this._callback = null;
             this._accessKey = null;
             this._handler = null;
-        }
-
-        update(caption, callback, accessKey) {
-            this._caption = caption;
-            this._callback = callback;
-            this._accessKey = accessKey;
-            this.dispose();
-            this._handler = GM_registerMenuCommand(this._caption, this._callback, this._accessKey);
-            return this;
         }
 
         get caption() {
             return this._caption;
         }
 
-        set caption(val) {
-            this.update(val, this._callback, this._accessKey);
+        set caption(value) {
+            this._caption = value;
+            this._update();
         }
 
-        dispose() {
+        get accessKey() {
+            return this._accessKey;
+        }
+
+        set accessKey(value) {
+            this._accessKey = value;
+            this._update();
+        }
+
+        get callback() {
+            return this._callback;
+        }
+
+        set callback(value) {
+            this._callback = value;
+        }
+
+        enable() {
+            this._update(true);
+        }
+
+        disable() {
             if (this._handler !== null) {
+                // eslint-disable-next-line no-undef
                 GM_unregisterMenuCommand(this._handler);
                 this._handler = null;
             }
         }
+
+        _update(enable=false) {
+            if (this._handler === null) {
+                if (!enable) {
+                    return;
+                }
+            }
+
+            this.disable();
+            this._handler = GM_registerMenuCommand(this._caption, () => this._callback(), this._accessKey);
+        }
     }
 
-    function register(caption, callback, accessKey) {
-        return new MenuCommand().update(caption, callback, accessKey);
-    }
-
-    return {
-        register
-    };
+    return MenuCommand;
 })();
