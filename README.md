@@ -1,60 +1,72 @@
 # monkey-in-zoo
 
-Just keep monkey in zoo!
+[![](https://data.jsdelivr.com/v1/package/gh/Cologler/monkey-in-zoo-javascript/badge)](https://www.jsdelivr.com/package/gh/Cologler/monkey-in-zoo-javascript)
 
-**monkey-in-zoo** is a library wrap greasemonkey api or more.
+*Just keep monkey in zoo!*
+
+**monkey-in-zoo** is a library which provide nice api for greasemonkey script.
 
 * Test on tampermonkey.
 
 ## HOW-TO-USE
 
-### event-emitter.js
+1. find which module you need
+1. open jsDelivr CDN and copy url
+1. require them in your user script
+
+## Documents
+
+### greasemonkey-storage.js
+
+GreasemonkeyStorage implements Storage interface, base on GM sync API:
+
+* `GM_getValue`
+* `GM_setValue`
+* `GM_deleteValue`
+* `GM_listValues`
 
 ``` js
-const ee = new EventEmitter();
-ee.on(function(a, b, info) => {
-    assert this === 0;
-    assert a === 1;
-    assert b === 2;
-
-    // `info` is the call infos which append by `EventEmitter`.
-    // @prop {number} call - the call times. the first time is 1 (not 0).
-    // @prop {function} off - remove the listener from EventEmitter.
-    // @prop {function} stop - stop the listeners call chain in current emit.
-    assert info.call === 1;
-});
-ee.emit(0, 1, 2);
+// greasemonkeyStorage is singleton instance like sessionStorage or localStorage
+greasemonkeyStorage.setItem(..., ...);
 ```
 
-### dom.js
+### object-storage.js
+
+ObjectStorage implements Storage interface, base on JSON.
 
 ``` js
-Dom.query(selector, options);
-Dom.on(selector, callback, options);
-Dom.once(selector, callback, options);
+const storage = new ObjectStorage(storage: greasemonkeyStorage | sessionStorage | localStorage);
+storage.setItem(..., ...);
 ```
 
-### value.js
+When you create a `ObjectStorage`, you need to choice a base storage for it.
+
+### expirable-storage.js
+
+ExpirableStorage implements Storage interface,
+which allow you to get or set value with expired times.
+
+**NOTE: ObjectStorage is required.**
 
 ``` js
-let v1 = value.of('a', {});
-v1.get();   // same as GM_getValue('a', {})
-v1.set(1);  // same as GM_setValue('a', 1)
+const storage = new ExpirableStorage(storage: ObjectStorage);
+// you can set item with expired time:
+storage.setItem(key, value, expiresAt)
+// or
+storage.setItemExpiresAfter(k, v, expiresAfter)
+```
 
-// proxy for object
-let v2 = v1.then('b', {}).then('c', {});
-v2.get();
-// same as GM_getValue('a', {})?['b']?['c'] || {}
-v2.set(1);
-// same as
-// let d = GM_getValue('a', {});
-// d['b'] = d['b'] || {};
-// d['b']['c'] = 1
-// GM_setValue('a', d);
+Argument expires will compare with `new Date().getTime()` and decide if it should be remove or not.
 
-// proxy for cache value
-let v3 = v1.cache();
+### menu-command.js
 
-// as as property descriptor
-Object.defineProperty({}, 'a', v1.asPropertyDescriptor());
+MenuCommand provide a OOP way to use GM_MenuCommand API.
+
+``` js
+const menu = new MenuCommand();
+menu.caption = 'abc';
+menu.callback = () => ...;
+menu.accessKey = ...;
+menu.enable();
+menu.disable();
 ```
