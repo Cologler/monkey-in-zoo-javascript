@@ -94,7 +94,7 @@ const github = (() => {
             const info = node[TAG] || (node[TAG] = {});
 
             const db = DomBuilder;
-            const bg = node.querySelector('.file-header .file-actions .BtnGroup');
+            const bg = node.querySelector('.Box .BtnGroup');
 
             for (const action of this._actions) {
                 if (info[action.text]) {
@@ -142,7 +142,7 @@ const github = (() => {
         }
 
         apply() {
-            Dom.on('.file', z => {
+            Dom.on('.repository-content', z => {
                 this.exec(z);
             });
         }
