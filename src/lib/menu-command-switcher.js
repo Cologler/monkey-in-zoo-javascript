@@ -1,26 +1,7 @@
-'use strict';
-
 const MenuCommandSwitcher = (() => {
-
-    (() => {
-        function require(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require base module: <${name}>.`);
-            }
-        }
-
-        function grant(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
-            }
-        }
-
-        (function(errors) {
-            errors.filter(z => z).forEach(z => { throw z; });
-        })([
-            require(typeof MenuCommand, 'menu-command'),
-        ]);
-    })();
+    if (typeof MenuCommand === 'undefined') {
+        throw new Error(`require base module: <menu-command>.`);
+    }
 
     /**
      *
