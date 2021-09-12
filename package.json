@@ -5,8 +5,11 @@
   "main": "index.js",
   "devDependencies": {
     "@types/greasemonkey": "4.0.2",
+    "@types/gulp-header": "^2.0.0",
     "@types/mocha": "^9.0.0",
+    "del": "^6.0.0",
     "gulp": "^4.0.2",
+    "gulp-header": "^2.0.9",
     "mocha": "^9.1.1"
   },
   "scripts": {
