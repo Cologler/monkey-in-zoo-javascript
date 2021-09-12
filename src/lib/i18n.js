@@ -1,62 +1,45 @@
-// ==UserScript==
-// @name               i18n
-// @namespace          https://github.com/Cologler/
-// @version            0.1.0.2
-// @description        i18n for greasemonkey info.
-// @author             Cologler (skyoflw@gmail.com)
-// @grant              none
-// @license            MIT
-// ==/UserScript==
-
-// hosting on Github:       https://raw.githubusercontent.com/Cologler/monkey-in-zoo-javascript/master/src/i18n.js
-
-// let type script auto-completion work.
-(function() { function require(){}; require("greasemonkey"); })();
-
 const i18n = (() => {
-    'use strict';
+    // default language resolve order
+    const LANGUAGE_CODES = []
+    LANGUAGE_CODES.push(navigator.language.toLowerCase());  // en-us
+    LANGUAGE_CODES.push(this._tokens[0].replace('-', '_')); // en_us
+    LANGUAGE_CODES.push(this._tokens[0].split('-')[0]);     // en
+    LANGUAGE_CODES.push('');                                // default
 
-    class Resolver {
-        constructor() {
-            this._tokens = [];
-
-            this._tokens.push(navigator.language.toLowerCase()); // en-us
-            this._tokens.push(this._tokens[0].replace('-', '_')); // en_us
-            this._tokens.push(this._tokens[0].split('-')[0]); // en
-            this._tokens.push(''); // def
-        }
-
-        /**
-         *
-         *
-         * @param {{}} obj
-         * @memberof Resolver
-         */
-        resolve(obj) {
-            for (const token of this._tokens) {
-                if (obj.hasOwnProperty(token)) {
-                    return obj[token];
-                }
+    function getText(obj) {
+        for (const language of LANGUAGE_CODES) {
+            if (obj.hasOwnProperty(language)) {
+                return obj[language];
             }
         }
+        return obj[''] || '';
     }
 
-    function getDesc() {
+    /**
+     * get the description of the GM script
+     * @returns {string}
+     */
+    function getDescription() {
         const obj = Object.assign({
             '': GM_info.script.description
         }, GM_info.script.description_i18n);
-        return new Resolver().resolve(obj);
+        return getText(obj);
     }
 
+    /**
+     * get the name of the GM script
+     * @returns {string}
+     */
     function getName() {
         const obj = Object.assign({
             '': GM_info.script.name
         }, GM_info.script.name_i18n);
-        return new Resolver().resolve(obj);
+        return getText(obj);
     }
 
     return {
-        Resolver,
-        getDesc, getName
+        getDescription,
+        getName,
+        getText,
     };
 })();
