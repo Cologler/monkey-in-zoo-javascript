@@ -1,42 +1,10 @@
-// ==UserScript==
-// @name                value
-// @namespace           https://github.com/Cologler/
-// @version             0.2.1.1
-// @description         wrap GM_getValue/... apis.
-// @author              Cologler (skyoflw@gmail.com)
-// @grant               GM_getValue
-// @grant               GM_setValue
-// @grant               GM_deleteValue
-// @grant               GM_listValues
-// @grant               GM_addValueChangeListener
-// @grant               GM_removeValueChangeListener
-// @license             MIT
-// ==/UserScript==
-
-// let type script auto-completion work.
-(function() { function require(){}; require("greasemonkey"); })();
-
 const value = (() => {
-    'use strict';
-
-    (() => {
-        function grant(type, name) {
-            if (type === 'undefined') {
-                return new Error(`require GM api <${name}>, please add '// @grant ${name}' into user.js header.`);
-            }
-        }
-
-        (function(errors) {
-            errors.filter(z => z).forEach(z => { throw z; });
-        })([
-            grant(typeof GM_listValues, 'GM_listValues'),
-            grant(typeof GM_getValue, 'GM_getValue'),
-            grant(typeof GM_setValue, 'GM_setValue'),
-            grant(typeof GM_deleteValue, 'GM_deleteValue'),
-            grant(typeof GM_addValueChangeListener, 'GM_addValueChangeListener'),
-            grant(typeof GM_removeValueChangeListener, 'GM_removeValueChangeListener'),
-        ]);
-    })();
+    _MiZ_checkGrant('GM_listValues');
+    _MiZ_checkGrant('GM_getValue');
+    _MiZ_checkGrant('GM_setValue');
+    _MiZ_checkGrant('GM_deleteValue');
+    _MiZ_checkGrant('GM_addValueChangeListener');
+    _MiZ_checkGrant('GM_removeValueChangeListener');
 
     class Value {
         /**
