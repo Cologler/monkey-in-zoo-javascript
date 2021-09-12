@@ -1,7 +1,7 @@
 const ObjectStorage = (() => {
     'use strict';
 
-    class ObjectStorageWrapper {
+    class ObjectStorage {
         constructor(baseStorage) {
             this._baseStorage = baseStorage;
         }
@@ -40,16 +40,14 @@ const ObjectStorage = (() => {
         clear() {
             return this._baseStorage.clear();
         }
-    }
 
-    function openAsObjectStorage(baseStorage) {
-        if (baseStorage.supportObject) {
-            return baseStorage;
+        static open(storage) {
+            if (storage.supportObject) {
+                return storage;
+            }
+            return new ObjectStorage(storage);
         }
-        return new ObjectStorageWrapper(baseStorage);
     }
 
-    return {
-        open: openAsObjectStorage
-    }
+    return ObjectStorage
 })();
