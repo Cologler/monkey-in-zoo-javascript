@@ -1,17 +1,6 @@
-/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
-
-/**
- * MenuCommand provide a OOP way to use GM_MenuCommand API.
- *
- * You may need to grant following GM permissions for MenuCommand:
- * - GM_registerMenuCommand
- * - GM_unregisterMenuCommand
- *
- */
-
-// eslint-disable-next-line no-unused-vars
 const MenuCommand = (() => {
-    'use strict';
+    _MiZ_checkGrant('GM_registerMenuCommand');
+    _MiZ_checkGrant('GM_unregisterMenuCommand');
 
     class MenuCommand {
         constructor() {
