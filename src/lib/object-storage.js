@@ -1,51 +1,55 @@
-/* Copyright (c) 2019~2999 - Cologler <skyoflw@gmail.com> */
-
-/**
- * ObjectStorage implements Storage interface,
- * which allow you store object in json string.
- *
- */
-
-// eslint-disable-next-line no-unused-vars
 const ObjectStorage = (() => {
     'use strict';
 
-    class ObjectStorage {
+    class ObjectStorageWrapper {
         constructor(baseStorage) {
             this._baseStorage = baseStorage;
         }
 
-        get length() { return this._baseStorage.length; }
-
-        get supportObject() { return true; }
-
-        key(index) { return this._baseStorage.key(index); }
-
-        getItem(k) {
-            let val = this._baseStorage.getItem(k);
-            if (val !== null) {
-                if (!this._baseStorage.supportObject) {
-                    try {
-                        return JSON.parse(val);
-                    } catch (_) {
-                        return val;
-                    }
-                }
-            }
-            return val;
+        get length() {
+            return this._baseStorage.length;
         }
 
-        setItem(k, v) {
-            if (!this._baseStorage.supportObject) {
-                v = JSON.stringify(v);
-            }
-            return this._baseStorage.setItem(k, v);
+        get supportObject() {
+            return true;
         }
 
-        removeItem(k) { return this._baseStorage.removeItem(k); }
+        key(index) {
+            return this._baseStorage.key(index);
+        }
 
-        clear() { return this._baseStorage.clear(); }
+        getItem(key) {
+            let value = this._baseStorage.getItem(key);
+            if (value !== null) {
+                return JSON.parse(value);
+            }
+            return value;
+        }
+
+        setItem(key, value) {
+            if (value !== null) {
+                value = JSON.stringify(value);
+            }
+            return this._baseStorage.setItem(key, value);
+        }
+
+        removeItem(key) {
+            return this._baseStorage.removeItem(key);
+        }
+
+        clear() {
+            return this._baseStorage.clear();
+        }
     }
 
-    return ObjectStorage;
+    function openAsObjectStorage(baseStorage) {
+        if (baseStorage.supportObject) {
+            return baseStorage;
+        }
+        return new ObjectStorageWrapper(baseStorage);
+    }
+
+    return {
+        open: openAsObjectStorage
+    }
 })();
