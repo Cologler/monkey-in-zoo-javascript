@@ -11,7 +11,6 @@
 
 // hosting on GitHub:       https://github.com/Cologler/monkey-in-zoo-javascript/raw/master/src/dom.js
 // hosting on jsDelivr:     https://cdn.jsdelivr.net/gh/Cologler/monkey-in-zoo-javascript/src/dom.js
-// hosting on GreasyFork:   https://greasyfork.org/scripts/369578/code/dom.js
 
 const Dom = (() => {
     'use strict';

@@ -13,7 +13,6 @@
 
 // hosting on GitHub:
 // hosting on jsDelivr:     https://cdn.jsdelivr.net/gh/Cologler/monkey-in-zoo-javascript/src/lib-github.js
-// hosting on GreasyFork:
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();

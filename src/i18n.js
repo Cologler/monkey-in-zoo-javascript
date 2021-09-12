@@ -9,7 +9,6 @@
 // ==/UserScript==
 
 // hosting on Github:       https://raw.githubusercontent.com/Cologler/monkey-in-zoo-javascript/master/src/i18n.js
-// hosting on GreasyFork:   https://greasyfork.org/scripts/370084/code/i18n.js
 
 // let type script auto-completion work.
 (function() { function require(){}; require("greasemonkey"); })();
