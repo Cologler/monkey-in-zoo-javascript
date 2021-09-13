@@ -90,10 +90,10 @@ const Dom = (() => {
 
         const rootElement = options?.element || document;
         const observerOptions = Object.assign({
-            childList: true,
             subtree: true,
-            attributes: true,
-            characterData: true,
+            childList: true,
+            attributes: false,
+            characterData: false,
         }, options?.observerOptions || {});
 
         // call on ready
