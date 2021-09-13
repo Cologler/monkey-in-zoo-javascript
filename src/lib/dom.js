@@ -54,7 +54,7 @@ const Dom = (() => {
 
                         case 'attributes':
                         case 'characterData':
-                            if (!shouldSkip(el) && mr.target.matches && mr.target.matches(this._selector)) {
+                            if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(this._selector)) {
                                 callbackWrapper(mr.target);
                             }
                             break;
