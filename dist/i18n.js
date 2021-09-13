@@ -61,8 +61,8 @@ const i18n = (() => {
     // default language resolve order
     const LANGUAGE_CODES = []
     LANGUAGE_CODES.push(navigator.language.toLowerCase());  // en-us
-    LANGUAGE_CODES.push(this._tokens[0].replace('-', '_')); // en_us
-    LANGUAGE_CODES.push(this._tokens[0].split('-')[0]);     // en
+    LANGUAGE_CODES.push(LANGUAGE_CODES[0].replace('-', '_')); // en_us
+    LANGUAGE_CODES.push(LANGUAGE_CODES[0].split('-')[0]);     // en
     LANGUAGE_CODES.push('');                                // default
 
     function getText(obj) {
