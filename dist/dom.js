@@ -57,8 +57,7 @@ function _MiZ_checkGrant(apiName) {
     }
 }
 
-const Dom = (() => {
-
+var dom = (() => {
     /**
      *
      * @param {string} selector
@@ -167,3 +166,6 @@ const Dom = (() => {
         once
     };
 })();
+
+// for compatibility
+var Dom = dom;

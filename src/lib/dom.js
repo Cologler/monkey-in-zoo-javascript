@@ -1,5 +1,4 @@
-const Dom = (() => {
-
+var dom = (() => {
     /**
      *
      * @param {string} selector
@@ -108,3 +107,6 @@ const Dom = (() => {
         once
     };
 })();
+
+// for compatibility
+var Dom = dom;
