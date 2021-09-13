@@ -36,11 +36,6 @@ var dom = (() => {
             characterData: false,
         }, options?.observerOptions || {});
 
-        // call on ready
-        for (const el of rootElement.querySelectorAll(selector)) {
-            callbackWrapper(el);
-        }
-
         let observer = new MutationObserver(mrs => {
             mrs.forEach(mr => {
                 if (mr.target.nodeType === Node.ELEMENT_NODE) {
@@ -62,7 +57,17 @@ var dom = (() => {
             });
         });
 
-        observer.observe(rootElement, observerOptions);
+        // use timeout so the `once` function can get the handler
+        setTimeout(() => {
+            if (!disposed) {
+                for (const el of rootElement.querySelectorAll(selector)) {
+                    callbackWrapper(el);
+                }
+                observer.observe(rootElement, observerOptions);
+            } else {
+                observer = null; // we don't have to call `disconnect`
+            }
+        });
 
         return {
             dispose: () => {
