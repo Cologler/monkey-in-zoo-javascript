@@ -13,7 +13,8 @@
     "mocha": "^9.1.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "gulp build"
   },
   "author": "Cologler",
   "license": "MIT"
