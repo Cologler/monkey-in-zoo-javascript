@@ -70,7 +70,7 @@ var dom = (() => {
         if (typeof options !== 'object') throw new Error('options must be object.');
 
         let disposed = false;
-        let emittedElements = new Set();
+        const emittedElements = new WeakSet();
 
         function shouldSkip(element) {
             return disposed || emittedElements.has(element);
@@ -135,10 +135,6 @@ var dom = (() => {
                     if (observer) {
                         observer.disconnect();
                         observer = null;
-                    }
-                    if (emittedElements) {
-                        emittedElements.clear();
-                        emittedElements = null;
                     }
                 }
             }
