@@ -18,11 +18,11 @@
 
 ## External Packages
 
-A list of external packages you can `@require` direct:
+A list of external packages that you can use via `@require` without bundle:
 
-| Name                                                         | CDN (jsDelivr)                                               | CDN (cdnjs)                                       |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------- |
-| [Olical/EventEmitter](https://github.com/Olical/EventEmitter/) | [jsdelivr](https://www.jsdelivr.com/package/npm/wolfy87-eventemitter) | [cdnjs](https://cdnjs.com/libraries/EventEmitter) |
-|                                                              |                                                              |                                                   |
-|                                                              |                                                              |                                                   |
+| Name                                                         | CDN (jsDelivr)                                               | CDN (cdnjs)                                       | File To Require   |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------- | ----------------- |
+| [Olical/EventEmitter](https://github.com/Olical/EventEmitter/) | [jsdelivr](https://www.jsdelivr.com/package/npm/wolfy87-eventemitter) | [cdnjs](https://cdnjs.com/libraries/EventEmitter) |                   |
+| [blueimp/Gallery](https://github.com/blueimp/Gallery)        | [jsdelivr](https://www.jsdelivr.com/package/gh/blueimp/Gallery) |                                                   |                   |
+| [acornjs/acorn](https://github.com/acornjs/acorn)            | [jsdelivr](https://www.jsdelivr.com/package/npm/acorn)       |                                                   | dist/acorn.min.js |
 
