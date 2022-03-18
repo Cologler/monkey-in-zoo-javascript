@@ -25,4 +25,4 @@ A list of external packages that you can use via `@require` without bundle:
 | [Olical/EventEmitter](https://github.com/Olical/EventEmitter/) | [jsdelivr](https://www.jsdelivr.com/package/npm/wolfy87-eventemitter) | [cdnjs](https://cdnjs.com/libraries/EventEmitter) |                   |
 | [blueimp/Gallery](https://github.com/blueimp/Gallery)        | [jsdelivr](https://www.jsdelivr.com/package/gh/blueimp/Gallery) |                                                   |                   |
 | [acornjs/acorn](https://github.com/acornjs/acorn)            | [jsdelivr](https://www.jsdelivr.com/package/npm/acorn)       |                                                   | dist/acorn.min.js |
-
+| [RonenNess/ExpiredStorage](https://github.com/RonenNess/ExpiredStorage) | [jsdelivr](https://www.jsdelivr.com/package/gh/RonenNess/ExpiredStorage) | | |
