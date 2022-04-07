@@ -7,11 +7,11 @@ var hooker = (() => {
      * @param {T} target
      * @returns {ProxyHandler<T>}
      */
-    function mock(target) {
+    function mock(target = {}) {
         return new Proxy(target, {
             get: function(target, property, receiver) {
                 console.debug(`get ${property}`);
-                return mock(target);
+                return mock(target[property]);
             }
         });
     }
