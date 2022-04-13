@@ -43,9 +43,19 @@ var hooker = (() => {
         });
     }
 
+    /**
+     * A helper function for hook function on globalThis.
+     * @param {PropertyKey} functionName
+     * @param {(...args: any[]) => any} wrapper
+     */
+    function hookGlobal(functionName, wrapper) {
+        globalThis[functionName] = hooker.hookBefore(globalThis[functionName], wrapper);
+    }
+
     return {
         mock,
         hookFunc,
         hookBefore,
+        hookGlobal,
     }
 })();
