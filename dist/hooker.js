@@ -85,7 +85,14 @@ var hooker = (() => {
         return function() {
             const self = this;
             const args = arguments;
-            return wrapper.call(self, args, () => wrapped.apply(self, args));
+            const next = () => wrapped.apply(self, args);
+            Object.defineProperty(next, 'origin', {
+                value: wrapped,
+                enumerable: false,
+                configurable: false,
+                writable: false
+            });
+            return wrapper.call(self, args, next);
         };
     }
 
@@ -102,9 +109,19 @@ var hooker = (() => {
         });
     }
 
+    /**
+     * A helper function for hook function on globalThis.
+     * @param {PropertyKey} functionName
+     * @param {(...args: any[]) => any} wrapper
+     */
+    function hookGlobal(functionName, wrapper) {
+        globalThis[functionName] = hooker.hookBefore(globalThis[functionName], wrapper);
+    }
+
     return {
         mock,
         hookFunc,
         hookBefore,
+        hookGlobal,
     }
 })();
