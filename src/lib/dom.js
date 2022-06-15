@@ -90,7 +90,7 @@ var dom = (() => {
             return disposed || emittedElements.has(element);
         }
 
-        function callbackWrapper(el) {
+        function emit(el) {
             if (disposed) {
                 return;
             }
@@ -114,15 +114,13 @@ var dom = (() => {
                 if (mr.target.nodeType === Node.ELEMENT_NODE) {
                     switch (mr.type) {
                         case 'childList':
-                            if (mr.target.querySelectorAll) {
-                                mr.target.querySelectorAll(selector).forEach(z => callbackWrapper(z));
-                            }
+                            mr.target?.querySelectorAll && mr.target.querySelectorAll(selector).forEach(emit);
                             break;
 
                         case 'attributes':
                         case 'characterData':
                             if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(this._selector)) {
-                                callbackWrapper(mr.target);
+                                emit(mr.target);
                             }
                             break;
                     }
@@ -133,9 +131,7 @@ var dom = (() => {
         // use timeout so the `once` function can get the handler
         setTimeout(() => {
             if (!disposed) {
-                for (const el of rootElement.querySelectorAll(selector)) {
-                    callbackWrapper(el);
-                }
+                rootElement.querySelectorAll && rootElement.querySelectorAll(selector).forEach(emit);
                 observer.observe(rootElement, observerOptions);
             } else {
                 observer = null; // we don't have to call `disconnect`
