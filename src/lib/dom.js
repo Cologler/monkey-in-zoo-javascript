@@ -1,4 +1,77 @@
 var dom = (() => {
+
+    /**
+     * wrap the function to ensure call once only
+     * @param {(...args) => any} func
+     * @returns
+     */
+    function callOnce(func) {
+        let called = false;
+        let funcRef = func;
+
+        return function () {
+            if (!called) {
+                called = true;
+                const val = funcRef.apply(this, arguments);
+                funcRef = null; // release fn
+                return val;
+            }
+        };
+    }
+
+    /**
+     * Watch on any nodes removed from document.
+     *
+     * This won't emit the moved nodes.
+     *
+     * @param {(node: Node) => void} callback
+     * @param {Element?} fromElement
+     * @returns
+     */
+    function onNodeRemoved(callback, fromElement = null) {
+        if (!fromElement) {
+            fromElement = document;
+        }
+
+        const observer = new MutationObserver(mrs => {
+            let removed = null;
+
+            for (const mr of mrs) {
+                if (mr.type === 'childList') {
+                    if (removed === null) {
+                        removed = [];
+                    }
+                    if (mr.removedNodes.length > 0) {
+                        removed.push(...mr.removedNodes);
+                    }
+                    if (mr.addedNodes.length > 0) {
+                        for (const node of mr.addedNodes) {
+                            const index = removed.indexOf(node);
+                            if (index > -1) {
+                                removed.splice(index, 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (removed !== null) {
+                for (const node of removed) {
+                    callback(node);
+                }
+            }
+        });
+
+        observer.observe(fromElement, {
+            childList: true,
+            subtree: true
+        });
+
+        return {
+            dispose: () => observer.disconnect()
+        }
+    }
+
     /**
      *
      * @param {string} selector
@@ -85,27 +158,26 @@ var dom = (() => {
     /**
      *
      * @param {*} selector
-     * @param {function} callback
+     * @param {Function} callback
      * @param {Options} [options=null]
      * @returns
      */
     function once(selector, callback, options = null) {
-        let called = false;
-        function callbackWrapper(el) {
-            if (called) {
-                return;
-            }
-            called = true;
+        const cb = callOnce((...x) => {
+            console.assert(rv !== null);
             rv.dispose();
-            callback(el);
-        }
-        let rv = on(selector, callbackWrapper, options);
+            rv = null;
+            return callback(...x);
+        });
+
+        let rv = on(selector, cb, options);
         return rv;
     }
 
     return {
         on,
-        once
+        once,
+        onNodeRemoved,
     };
 })();
 
