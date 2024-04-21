@@ -83,43 +83,49 @@ var dom = (() => {
         if (typeof selector !== 'string') throw new Error('selector must be string.');
         if (typeof options !== 'object') throw new Error('options must be object.');
 
-        let disposed = false;
-        const emittedElements = new WeakSet();
-
-        function shouldSkip(element) {
-            return disposed || emittedElements.has(element);
-        }
-
-        function emit(el) {
-            if (disposed) {
-                return;
-            }
-            if (emittedElements.has(el)) {
-                return;
-            }
-            emittedElements.add(el);
-            callback(el);
-        }
-
         const rootElement = options?.element || document;
         const observerOptions = Object.assign({
             subtree: true,
             childList: true,
-            attributes: false,
+            attributes: true,
             characterData: false,
         }, options?.observerOptions || {});
+        const allowsMultiTimes = options?.allowsMultiTimes || false;
+
+        let disposed = false;
+        const emitted = allowsMultiTimes ? null : new WeakSet();
+
+        function allowsEmit(el) {
+            return allowsMultiTimes || !emitted.has(el);
+        }
+
+        function shouldSkip(el) {
+            return disposed || !allowsEmit(el);
+        }
+
+        function emit(el) {
+            if (disposed || !allowsEmit(el)) {
+                return;
+            }
+            emitted?.add(el);
+            callback(el);
+        }
 
         let observer = new MutationObserver(mrs => {
             mrs.forEach(mr => {
                 if (mr.target.nodeType === Node.ELEMENT_NODE) {
                     switch (mr.type) {
                         case 'childList':
-                            mr.target?.querySelectorAll && mr.target.querySelectorAll(selector).forEach(emit);
+                            mr.addedNodes.forEach(node => {
+                                if (!shouldSkip(node) && node.matches && node.matches(selector)) {
+                                    emit(node);
+                                }
+                            })
                             break;
 
                         case 'attributes':
                         case 'characterData':
-                            if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(this._selector)) {
+                            if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(selector)) {
                                 emit(mr.target);
                             }
                             break;
@@ -170,10 +176,102 @@ var dom = (() => {
         return rv;
     }
 
+    const logInfo = console.info
+
+    /**
+     * Log changed by selector
+     * @param {string} selector
+     * @returns void
+     */
+    function track(selector) {
+        /**
+         *
+         * @param {MutationRecord} record
+         * @param {Element} target
+         */
+        function logMutationRecord(record, target) {
+            logInfo(`Tracked ${selector} from MutationObserver`, {
+                target,
+                record,
+            })
+
+            switch (record.type) {
+                case 'childList':
+                    break;
+                case 'attributes':
+                    logInfo(`Attributes(${record.attributeName}) updated:`,
+                        record.oldValue,
+                        target.getAttribute(record.attributeName))
+                    break;
+                case 'characterData':
+                    logInfo(`CharacterData(${record.oldValue}) updated:`,
+                        record.oldValue,
+                        target.textContent)
+                    break;
+            }
+        }
+
+        document.querySelectorAll(selector).forEach(target => {
+            logInfo(`Tracked ${selector} from document`, {
+                target,
+            })
+        });
+
+        /**
+         * 
+         * @param {Node} node
+         * @param {MutationRecord} record
+         */
+        function handler(node, record) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = /** @type {Element} */ (node);
+                if (element.matches(selector)) {
+                    logMutationRecord(record, element);
+                }
+            }
+        }
+
+        let observerTrigger = new MutationObserver(mrs => {
+            mrs.forEach(mr => {
+                switch (mr.type) {
+                    case 'childList':
+                        mr.addedNodes.forEach(node => {
+                            handler(node, mr);
+                        })
+                        break;
+
+                    case 'attributes':
+                    case 'characterData':
+                        handler(mr.target, mr);
+                        break;
+                }
+            });
+        });
+
+        observerTrigger.observe(document, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeOldValue: true,
+            characterData: true,
+            characterDataOldValue: true,
+        })
+
+        return {
+            dispose: () => {
+                if (observerTrigger) {
+                    observerTrigger.disconnect();
+                    observerTrigger = null;
+                }
+            }
+        };
+    }
+
     return {
         on,
         once,
         onNodeRemoved,
+        track,
     };
 })();
 
