@@ -93,31 +93,26 @@ var dom = (() => {
         }
 
         const observer = new MutationObserver(mrs => {
-            let removed = null;
+            // Repeated removals in one batch should trigger only one callback per node.
+            /** @type {Set<Node>} */
+            const removed = new Set();
 
             for (const mr of mrs) {
                 if (mr.type === 'childList') {
-                    if (removed === null) {
-                        removed = [];
-                    }
-                    if (mr.removedNodes.length > 0) {
-                        removed.push(...mr.removedNodes);
-                    }
-                    if (mr.addedNodes.length > 0) {
-                        for (const node of mr.addedNodes) {
-                            const index = removed.indexOf(node);
-                            if (index > -1) {
-                                removed.splice(index, 1);
-                            }
-                        }
+                    for (const node of mr.removedNodes) {
+                        removed.add(node);
                     }
                 }
             }
 
-            if (removed !== null) {
-                for (const node of removed) {
-                    callback(node);
-                }
+            // A node can return inside an added ancestor without appearing in addedNodes itself.
+            // Filter the entire batch before callbacks can reinsert other nodes.
+            const nodesToNotify = [...removed].filter(
+                /** @param {Node} node */
+                node => !fromElement.contains(node)
+            );
+            for (const node of nodesToNotify) {
+                callback(node);
             }
         });
 
