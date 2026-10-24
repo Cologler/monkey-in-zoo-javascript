@@ -135,7 +135,7 @@ var dom = (() => {
      * @typedef {object} Options
      * @property {Node | null} [element=null] The root node to observe; defaults to document.
      * @property {MutationObserverInit | null} [observerOptions=null] Overrides the default mutation observer options.
-     * @property {boolean} [allowsMultiTimes=false] Allows the same element to trigger the callback more than once.
+     * @property {boolean} [allowsMultiTimes=false] Allows an element to trigger the callback again after an observed removal.
      */
 
     /**
@@ -167,7 +167,7 @@ var dom = (() => {
          * @param {Node} el
          */
         function allowsEmit(el) {
-            return allowsMultiTimes || !el[emittedSymbol];
+            return !el[emittedSymbol];
         }
 
         /**
@@ -178,10 +178,27 @@ var dom = (() => {
         }
 
         /**
+         * @param {Node} node
+         */
+        function clearEmitted(node) {
+            delete node[emittedSymbol];
+
+            // Removed subtrees may contain marked elements that no longer match the selector.
+            const walker = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT);
+            while (walker.nextNode()) {
+                delete walker.currentNode[emittedSymbol];
+            }
+        }
+
+        /**
          * @param {Element} el
          */
         function emit(el) {
             if (disposed || !allowsEmit(el)) {
+                return;
+            }
+            // Pending records can reference detached nodes; leave their markers cleared.
+            if (allowsMultiTimes && !rootElement.contains(el)) {
                 return;
             }
             el[emittedSymbol] = true;
@@ -189,6 +206,15 @@ var dom = (() => {
         }
 
         let observer = new MutationObserver(mrs => {
+            if (allowsMultiTimes) {
+                // Clear first so removals and insertions in the same batch can emit again.
+                for (const mr of mrs) {
+                    if (mr.type === 'childList') {
+                        mr.removedNodes.forEach(clearEmitted);
+                    }
+                }
+            }
+
             mrs.forEach(mr => {
                 if (mr.target.nodeType === Node.ELEMENT_NODE) {
                     switch (mr.type) {

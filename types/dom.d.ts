@@ -8,7 +8,7 @@ declare namespace dom {
         element?: Node | null;
         /** Overrides the default subtree, childList, and attributes observation. */
         observerOptions?: MutationObserverInit | null;
-        /** Allows the same element to trigger the callback more than once. */
+        /** Allows an element to trigger the callback again after an observed removal. */
         allowsMultiTimes?: boolean;
     }
 
