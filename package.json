@@ -17,5 +17,6 @@
     "build": "gulp build"
   },
   "author": "Cologler",
-  "license": "MIT"
+  "license": "MIT",
+  "types": "dist/index.d.ts"
 }

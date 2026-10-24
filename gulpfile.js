@@ -14,6 +14,11 @@ function build() {
         .pipe(gulp.dest('dist'));
 }
 
+function buildTypes() {
+    return gulp.src('types/**/*.d.ts')
+        .pipe(gulp.dest('dist'));
+}
+
 module.exports = {
-    build: gulp.series(clean, build),
+    build: gulp.series(clean, build, buildTypes),
 }
