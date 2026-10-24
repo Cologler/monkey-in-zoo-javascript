@@ -132,16 +132,24 @@ var dom = (() => {
     }
 
     /**
+     * @typedef {object} Options
+     * @property {Node | null} [element=null] The root node to observe; defaults to document.
+     * @property {MutationObserverInit | null} [observerOptions=null] Overrides the default mutation observer options.
+     * @property {boolean} [allowsMultiTimes=false] Allows the same element to trigger the callback more than once.
+     */
+
+    /**
      *
      * @param {string} selector
      * @param {function} callback
-     * @param {Options} [options=null]
+     * @param {Options | null} [options=null]
      * @returns
      */
     function on(selector, callback, options = null) {
         if (typeof selector !== 'string') throw new Error('selector must be string.');
         if (typeof options !== 'object') throw new Error('options must be object.');
 
+        /** @type {Node & Partial<ParentNode>} */
         const rootElement = options?.element || document;
         const observerOptions = Object.assign({
             subtree: true,
@@ -152,21 +160,31 @@ var dom = (() => {
         const allowsMultiTimes = options?.allowsMultiTimes || false;
 
         let disposed = false;
-        const emitted = allowsMultiTimes ? null : new WeakSet();
+        // Keep emission markers isolated between subscriptions on the same element.
+        const emittedSymbol = Symbol('emitted');
 
+        /**
+         * @param {Node} el
+         */
         function allowsEmit(el) {
-            return allowsMultiTimes || !emitted.has(el);
+            return allowsMultiTimes || !el[emittedSymbol];
         }
 
+        /**
+         * @param {Node} el
+         */
         function shouldSkip(el) {
             return disposed || !allowsEmit(el);
         }
 
+        /**
+         * @param {Element} el
+         */
         function emit(el) {
             if (disposed || !allowsEmit(el)) {
                 return;
             }
-            emitted?.add(el);
+            el[emittedSymbol] = true;
             callback(el);
         }
 
@@ -177,7 +195,7 @@ var dom = (() => {
                         case 'childList':
                             mr.addedNodes.forEach(node => {
                                 if (!shouldSkip(node) && node.matches && node.matches(selector)) {
-                                    emit(node);
+                                    emit(/** @type {Element} */ (node));
                                 }
                             })
                             break;
@@ -185,7 +203,7 @@ var dom = (() => {
                         case 'attributes':
                         case 'characterData':
                             if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(selector)) {
-                                emit(mr.target);
+                                emit(/** @type {Element} */ (mr.target));
                             }
                             break;
                     }
@@ -220,7 +238,7 @@ var dom = (() => {
      *
      * @param {*} selector
      * @param {Function} callback
-     * @param {Options} [options=null]
+     * @param {Options | null} [options=null]
      * @returns
      */
     function once(selector, callback, options = null) {
