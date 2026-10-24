@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "types": ["@violentmonkey/types"]
+  },
+  "include": ["src/**/*.js"]
+}

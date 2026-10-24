@@ -4,9 +4,9 @@
   "description": "monkey-in-zoo is a library wrap greasemonkey api for easy to use.",
   "main": "index.js",
   "devDependencies": {
-    "@types/greasemonkey": "4.0.7",
     "@types/gulp-header": "^2.0.4",
     "@types/mocha": "^10.0.10",
+    "@violentmonkey/types": "0.3.4",
     "del": "^8.0.1",
     "gulp": "^5.0.1",
     "gulp-header": "^2.0.12",

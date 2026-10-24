@@ -8,15 +8,15 @@ importers:
 
   .:
     devDependencies:
-      '@types/greasemonkey':
-        specifier: 4.0.7
-        version: 4.0.7
       '@types/gulp-header':
         specifier: ^2.0.4
         version: 2.0.4
       '@types/mocha':
         specifier: ^10.0.10
         version: 10.0.10
+      '@violentmonkey/types':
+        specifier: 0.3.4
+        version: 0.3.4
       del:
         specifier: ^8.0.1
         version: 8.0.1
@@ -56,9 +56,6 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@types/greasemonkey@4.0.7':
-    resolution: {integrity: sha512-DuYBRf/T4zixO/xhQ3eicZCBjjOgbSSXuHP5XkLNf/UBayrJpBniP9il/AQaPy0lffl4Bco48zgHL+pZmQ6Q0A==}
-
   '@types/gulp-header@2.0.4':
     resolution: {integrity: sha512-zNdPJ4mSuB6X6idac2+Y+2+5X/WkfZ5rIcZSBFrJdvuXd1JaG2LyeMbzDPVEj35mMVRadmJa0v5UQ+1nfR+1NA==}
 
@@ -67,6 +64,9 @@ packages:
 
   '@types/node@26.5.1':
     resolution: {integrity: sha512-CzNm2FezW4VR/LjG6yUdiEgLE/rAQ9Slj5gCu/C2VrdcW7I0ahNZ8DRbHT7zOZ6r3ONgd/bsQIeSaoDGrd1C6g==}
+
+  '@violentmonkey/types@0.3.4':
+    resolution: {integrity: sha512-4i8/8X4Dk/py+RWTdfJbQcQGOx7COossGrw3uhrNegqwuAtC6pBXpJMKcdkPxxJklxmnWPaX4kvB5hypZfhY4g==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -743,6 +743,9 @@ packages:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
 
+  user-agent-data-types@0.4.3:
+    resolution: {integrity: sha512-Dn3fjwVgeM363mx1sEgOpOp9NNqHBj6Gn68dFbV1WoTr3s05CijKdxfH6A3Q5uzXnYNB6vdAfs/1HWFpObc7EQ==}
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -822,8 +825,6 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@types/greasemonkey@4.0.7': {}
-
   '@types/gulp-header@2.0.4':
     dependencies:
       '@types/node': 26.5.1
@@ -833,6 +834,10 @@ snapshots:
   '@types/node@26.5.1':
     dependencies:
       undici-types: 8.9.0
+
+  '@violentmonkey/types@0.3.4':
+    dependencies:
+      user-agent-data-types: 0.4.3
 
   ansi-regex@5.0.1: {}
 
@@ -1512,6 +1517,8 @@ snapshots:
   undici-types@8.9.0: {}
 
   unicorn-magic@0.3.0: {}
+
+  user-agent-data-types@0.4.3: {}
 
   util-deprecate@1.0.2: {}
 
