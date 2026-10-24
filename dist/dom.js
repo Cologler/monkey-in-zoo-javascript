@@ -256,7 +256,7 @@ var dom = (() => {
         setTimeout(() => {
             if (!disposed) {
                 rootElement.querySelectorAll && rootElement.querySelectorAll(selector).forEach(emit);
-                observer.observe(rootElement, observerOptions);
+                observer?.observe(rootElement, observerOptions);
             } else {
                 observer = null; // we don't have to call `disconnect`
             }
