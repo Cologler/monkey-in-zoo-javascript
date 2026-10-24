@@ -193,11 +193,13 @@ var dom = (() => {
             }
         });
 
-        // use timeout so the `once` function can get the handler
-        setTimeout(() => {
+        // Defer initial callbacks to a microtask so once() can receive the subscription handle.
+        queueMicrotask(() => {
             if (!disposed) {
-                rootElement.querySelectorAll && rootElement.querySelectorAll(selector).forEach(emit);
+                // Observe first to capture DOM changes made by initial callbacks.
+                // Mutation callbacks run after this synchronous scan, preserving initial emission order.
                 observer?.observe(rootElement, observerOptions);
+                rootElement.querySelectorAll && rootElement.querySelectorAll(selector).forEach(emit);
             } else {
                 observer = null; // we don't have to call `disconnect`
             }
