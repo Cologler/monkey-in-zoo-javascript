@@ -7,14 +7,14 @@ var dom = (() => {
      */
     function callOnce(func) {
         let called = false;
-        let funcRef = func;
 
         return function () {
             if (!called) {
                 called = true;
-                const val = funcRef.apply(this, arguments);
-                funcRef = null; // release fn
-                return val;
+                const funcRef = func;
+                // Clear the captured reference before invoking a callback that may throw.
+                func = null;
+                return funcRef.apply(this, arguments);
             }
         };
     }
