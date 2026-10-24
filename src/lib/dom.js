@@ -146,6 +146,27 @@ var dom = (() => {
             callback(el);
         }
 
+        /**
+         * @param {Node & Partial<ParentNode>} node
+         */
+        function emitMatches(node) {
+            if (disposed) {
+                return;
+            }
+
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = /** @type {Element} */ (node);
+                if (!shouldSkip(element) && element.matches(selector)) {
+                    emit(element);
+                }
+            }
+
+            // A previously emitted container can still contain unprocessed descendants.
+            if (!disposed) {
+                node.querySelectorAll?.(selector).forEach(emit);
+            }
+        }
+
         let observer = new MutationObserver(mrs => {
             if (allowsMultiTimes) {
                 // Clear first so removals and insertions in the same batch can emit again.
@@ -156,26 +177,20 @@ var dom = (() => {
                 }
             }
 
-            mrs.forEach(mr => {
-                if (mr.target.nodeType === Node.ELEMENT_NODE) {
-                    switch (mr.type) {
-                        case 'childList':
-                            mr.addedNodes.forEach(node => {
-                                if (!shouldSkip(node) && node.matches && node.matches(selector)) {
-                                    emit(/** @type {Element} */ (node));
-                                }
-                            })
-                            break;
-
-                        case 'attributes':
-                        case 'characterData':
-                            if (!shouldSkip(mr.target) && mr.target.matches && mr.target.matches(selector)) {
-                                emit(/** @type {Element} */ (mr.target));
-                            }
-                            break;
-                    }
+            // Attribute and text changes can affect selector matches outside the changed subtree.
+            if (mrs.some(mr => mr.type === 'attributes' || mr.type === 'characterData')) {
+                // Keep root rescans scoped to descendants, matching the initial scan.
+                if (!disposed) {
+                    rootElement.querySelectorAll?.(selector).forEach(emit);
                 }
-            });
+                return;
+            }
+
+            for (const mr of mrs) {
+                if (mr.type === 'childList') {
+                    mr.addedNodes.forEach(emitMatches);
+                }
+            }
         });
 
         // use timeout so the `once` function can get the handler
