@@ -3,6 +3,11 @@ declare namespace dom {
         dispose(): void;
     }
 
+    interface OnceHandle extends Disposable {
+        /** Waits for the first match; timeout is in milliseconds. */
+        wait(timeout: number): Promise<void>;
+    }
+
     interface Options {
         /** Defaults to document. */
         element?: Node | null;
@@ -34,17 +39,17 @@ declare namespace dom {
         selector: K,
         callback: (element: HTMLElementTagNameMap[K]) => void,
         options?: Options | null,
-    ): Disposable;
+    ): OnceHandle;
     function once<K extends keyof SVGElementTagNameMap>(
         selector: K,
         callback: (element: SVGElementTagNameMap[K]) => void,
         options?: Options | null,
-    ): Disposable;
+    ): OnceHandle;
     function once<E extends Element = Element>(
         selector: string,
         callback: (element: E) => void,
         options?: Options | null,
-    ): Disposable;
+    ): OnceHandle;
 
     /** Watches removed nodes, excluding moves detected within the same observer batch. */
     function onNodeRemoved(callback: (node: Node) => void, fromElement?: Node | null): Disposable;

@@ -221,18 +221,40 @@ var dom = (() => {
      * @param {*} selector
      * @param {Function} callback
      * @param {Options | null} [options=null]
-     * @returns
+     * @returns {{dispose: () => void, wait: (timeout: number) => Promise<void>}}
      */
     function once(selector, callback, options = null) {
+        const { promise: callbackWaiter, resolve: callbackResolve } = Promise.withResolvers();
+
         const cb = callOnce((...x) => {
             console.assert(rv !== null);
             rv.dispose();
             rv = null;
+            callbackResolve();
             return callback(...x);
         });
 
         let rv = on(selector, cb, options);
-        return rv;
+
+        /**
+         * @param {number} timeout Timeout in milliseconds.
+         * @returns {Promise<void>}
+         */
+        const wait = async (timeout) => {
+            const { promise: timeoutWaiter, reject: timeoutReject } = Promise.withResolvers();
+            const timer = setTimeout(() => {
+                rv.dispose();
+                timeoutReject();
+            }, timeout);
+
+            try {
+                await Promise.race([callbackWaiter, timeoutWaiter]);
+            } finally {
+                clearTimeout(timer);
+            }
+        };
+
+        return { ...rv, wait };
     }
 
     const logInfo = console.info
