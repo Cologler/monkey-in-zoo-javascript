@@ -1,6 +1,9 @@
+/// <reference lib="esnext.disposable" />
+
 declare namespace dom {
     interface Disposable {
         dispose(): void;
+        [Symbol.dispose](): void;
     }
 
     interface OnceHandle extends Disposable {

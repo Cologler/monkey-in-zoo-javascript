@@ -60,6 +60,13 @@ function _MiZ_checkGrant(apiName) {
 var dom = (() => {
 
     /**
+     * @param {() => void} dispose
+     */
+    function disposable(dispose) {
+        return { dispose, [Symbol.dispose]: dispose };
+    }
+
+    /**
      * wrap the function to ensure call once only
      * @param {(...args) => any} func
      * @returns
@@ -121,9 +128,7 @@ var dom = (() => {
             subtree: true
         });
 
-        return {
-            dispose: () => observer.disconnect()
-        }
+        return disposable(() => observer.disconnect());
     }
 
     /**
@@ -259,17 +264,15 @@ var dom = (() => {
             }
         });
 
-        return {
-            dispose: () => {
-                if (!disposed) {
-                    disposed = true;
-                    if (observer) {
-                        observer.disconnect();
-                        observer = null;
-                    }
+        return disposable(() => {
+            if (!disposed) {
+                disposed = true;
+                if (observer) {
+                    observer.disconnect();
+                    observer = null;
                 }
             }
-        };
+        });
     }
 
     /**
@@ -277,7 +280,7 @@ var dom = (() => {
      * @param {*} selector
      * @param {Function} callback
      * @param {Options | null} [options=null]
-     * @returns {{dispose: () => void, wait: (timeout: number) => Promise<void>}}
+     * @returns {{dispose: () => void, [Symbol.dispose]: () => void, wait: (timeout: number) => Promise<void>}}
      */
     function once(selector, callback, options = null) {
         const { promise: callbackWaiter, resolve: callbackResolve } = Promise.withResolvers();
@@ -394,14 +397,12 @@ var dom = (() => {
             characterDataOldValue: true,
         })
 
-        return {
-            dispose: () => {
-                if (observerTrigger) {
-                    observerTrigger.disconnect();
-                    observerTrigger = null;
-                }
+        return disposable(() => {
+            if (observerTrigger) {
+                observerTrigger.disconnect();
+                observerTrigger = null;
             }
-        };
+        });
     }
 
     return {
